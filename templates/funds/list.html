@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}Funds - ASSI WMS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Funds Management</h1>
+        <a href="{{ url_for('add_fund') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add New Fund
+        </a>
+    </div>
+    
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold">All Funds</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover" id="fundsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Balance</th>
+                            <th>Currency</th>
+                            <th>Exchange Rate</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fund in funds %}
+                        <tr>
+                            <td>{{ fund.id }}</td>
+                            <td>{{ fund.name }}</td>
+                            <td>{{ "%.2f"|format(fund.balance) }}</td>
+                            <td>{{ fund.currency }}</td>
+                            <td>{{ "%.4f"|format(fund.exchange_rate) }}</td>
+                            <td>
+                                {% if fund.is_active %}
+                                <span class="badge bg-success">Active</span>
+                                {% else %}
+                                <span class="badge bg-danger">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('view_fund', fund_id=fund.id) }}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                                <button class="btn btn-sm btn-primary edit-fund" data-id="{{ fund.id }}">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                {% if fund.is_active %}
+                                <button class="btn btn-sm btn-danger deactivate-fund" data-id="{{ fund.id }}">
+                                    <i class="fas fa-ban"></i> Deactivate
+                                </button>
+                                {% else %}
+                                <button class="btn btn-sm btn-success activate-fund" data-id="{{ fund.id }}">
+                                    <i class="fas fa-check"></i> Activate
+                                </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% if funds|length == 0 %}
+                        <tr>
+                            <td colspan="7" class="text-center">No funds found</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Fund Modal -->
+<div class="modal fade" id="editFundModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Fund</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editFundForm">
+                    <input type="hidden" id="editFundId" name="fund_id">
+                    <div class="mb-3">
+                        <label for="editName" class="form-label">Fund Name</label>
+                        <input type="text" class="form-control" id="editName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editCurrency" class="form-label">Currency</label>
+                        <select class="form-select" id="editCurrency" name="currency" required>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                            <option value="SYP">SYP</option>
+                            <option value="SAR">SAR</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editExchangeRate" class="form-label">Exchange Rate (to USD)</label>
+                        <input type="number" step="0.0001" class="form-control" id="editExchangeRate" name="exchange_rate" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveFundChanges">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        // Initialize DataTable
+        $('#fundsTable').DataTable({
+            responsive: true
+        });
+        
+        // Edit Fund Button Click
+        $('.edit-fund').click(function() {
+            const fundId = $(this).data('id');
+            
+            // Fetch fund data
+            $.getJSON(`/api/fund/${fundId}`, function(data) {
+                $('#editFundId').val(data.id);
+                $('#editName').val(data.name);
+                $('#editCurrency').val(data.currency);
+                $('#editExchangeRate').val(data.exchange_rate);
+                
+                $('#editFundModal').modal('show');
+            });
+        });
+        
+        // Save Fund Changes
+        $('#saveFundChanges').click(function() {
+            const fundId = $('#editFundId').val();
+            const formData = {
+                name: $('#editName').val(),
+                currency: $('#editCurrency').val(),
+                exchange_rate: $('#editExchangeRate').val()
+            };
+            
+            $.ajax({
+                url: `/api/fund/${fundId}/update`,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    $('#editFundModal').modal('hide');
+                    if (response.success) {
+                        alert('Fund updated successfully!');
+                        location.reload();
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while updating the fund.');
+                }
+            });
+        });
+        
+        // Activate/Deactivate Fund
+        $('.activate-fund, .deactivate-fund').click(function() {
+            const fundId = $(this).data('id');
+            const action = $(this).hasClass('activate-fund') ? 'activate' : 'deactivate';
+            
+            if (confirm(`Are you sure you want to ${action} this fund?`)) {
+                $.post(`/api/fund/${fundId}/${action}`, function(response) {
+                    if (response.success) {
+                        alert(`Fund ${action}d successfully!`);
+                        location.reload();
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

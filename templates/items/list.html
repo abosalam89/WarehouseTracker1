@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+
+{% block title %}Items - ASSI WMS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Items Management</h1>
+        <a href="{{ url_for('add_item') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add New Item
+        </a>
+    </div>
+    
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold">All Items</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover" id="itemsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Main Unit</th>
+                            <th>Sub Unit</th>
+                            <th>Conversion Rate</th>
+                            <th>Purchase Price</th>
+                            <th>Selling Price</th>
+                            <th>Total Stock</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>{{ item.id }}</td>
+                            <td>{{ item.name }}</td>
+                            <td>{{ item.description }}</td>
+                            <td>{{ item.main_unit }}</td>
+                            <td>{{ item.sub_unit }}</td>
+                            <td>{{ item.conversion_rate }}</td>
+                            <td>{{ "%.2f"|format(item.purchase_price) }}</td>
+                            <td>{{ "%.2f"|format(item.selling_price) }}</td>
+                            <td>{{ "%.2f"|format(item.get_total_stock()) }}</td>
+                            <td>
+                                {% if item.is_active %}
+                                <span class="badge bg-success">Active</span>
+                                {% else %}
+                                <span class="badge bg-danger">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-info view-stock" data-id="{{ item.id }}">
+                                    <i class="fas fa-cubes"></i> Stock
+                                </button>
+                                <button class="btn btn-sm btn-primary edit-item" data-id="{{ item.id }}">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                {% if item.is_active %}
+                                <button class="btn btn-sm btn-danger deactivate-item" data-id="{{ item.id }}">
+                                    <i class="fas fa-ban"></i> Deactivate
+                                </button>
+                                {% else %}
+                                <button class="btn btn-sm btn-success activate-item" data-id="{{ item.id }}">
+                                    <i class="fas fa-check"></i> Activate
+                                </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% if items|length == 0 %}
+                        <tr>
+                            <td colspan="11" class="text-center">No items found</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View Stock Modal -->
+<div class="modal fade" id="viewStockModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Item Stock Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <strong>Item:</strong> <span id="stockItemName"></span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover" id="stockTable">
+                        <thead>
+                            <tr>
+                                <th>Warehouse</th>
+                                <th>Quantity (Main Unit)</th>
+                                <th>Quantity (Sub Unit)</th>
+                                <th>Last Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stockTableBody">
+                            <!-- Will be filled via AJAX -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Item Modal -->
+<div class="modal fade" id="editItemModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editItemForm">
+                    <input type="hidden" id="editItemId" name="item_id">
+                    <div class="mb-3">
+                        <label for="editName" class="form-label">Item Name</label>
+                        <input type="text" class="form-control" id="editName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="editDescription" name="description" rows="2"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="editMainUnit" class="form-label">Main Unit</label>
+                            <input type="text" class="form-control" id="editMainUnit" name="main_unit" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editSubUnit" class="form-label">Sub Unit</label>
+                            <input type="text" class="form-control" id="editSubUnit" name="sub_unit" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editConversionRate" class="form-label">Conversion Rate</label>
+                        <div class="input-group">
+                            <span class="input-group-text">1 <span id="mainUnitLabel"></span> =</span>
+                            <input type="number" step="0.001" min="0.001" class="form-control" id="editConversionRate" name="conversion_rate" required>
+                            <span class="input-group-text"><span id="subUnitLabel"></span></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="editPurchasePrice" class="form-label">Purchase Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" step="0.01" min="0" class="form-control" id="editPurchasePrice" name="purchase_price" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editSellingPrice" class="form-label">Selling Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" step="0.01" min="0" class="form-control" id="editSellingPrice" name="selling_price" required>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveItemChanges">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        // Initialize DataTable
+        $('#itemsTable').DataTable({
+            responsive: true
+        });
+        
+        // View Stock Button Click
+        $('.view-stock').click(function() {
+            const itemId = $(this).data('id');
+            
+            // Fetch item stock data
+            $.getJSON(`/api/item/${itemId}/stock`, function(data) {
+                $('#stockItemName').text(data.item_name);
+                
+                // Clear and populate stock table
+                $('#stockTableBody').empty();
+                if (data.stocks.length === 0) {
+                    $('#stockTableBody').append('<tr><td colspan="4" class="text-center">No stock found</td></tr>');
+                } else {
+                    $.each(data.stocks, function(i, stock) {
+                        const subUnitQty = stock.quantity * data.conversion_rate;
+                        $('#stockTableBody').append(`
+                            <tr>
+                                <td>${stock.warehouse_name}</td>
+                                <td>${stock.quantity.toFixed(2)} ${data.main_unit}</td>
+                                <td>${subUnitQty.toFixed(2)} ${data.sub_unit}</td>
+                                <td>${stock.updated_at}</td>
+                            </tr>
+                        `);
+                    });
+                }
+                
+                $('#viewStockModal').modal('show');
+            });
+        });
+        
+        // Edit Item Button Click
+        $('.edit-item').click(function() {
+            const itemId = $(this).data('id');
+            
+            // Fetch item data
+            $.getJSON(`/api/item/${itemId}`, function(data) {
+                $('#editItemId').val(data.id);
+                $('#editName').val(data.name);
+                $('#editDescription').val(data.description);
+                $('#editMainUnit').val(data.main_unit);
+                $('#editSubUnit').val(data.sub_unit);
+                $('#editConversionRate').val(data.conversion_rate);
+                $('#editPurchasePrice').val(data.purchase_price);
+                $('#editSellingPrice').val(data.selling_price);
+                
+                // Update unit labels
+                $('#mainUnitLabel').text(data.main_unit);
+                $('#subUnitLabel').text(data.sub_unit);
+                
+                $('#editItemModal').modal('show');
+            });
+        });
+        
+        // Update unit labels when units change
+        $('#editMainUnit, #editSubUnit').on('input', function() {
+            $('#mainUnitLabel').text($('#editMainUnit').val());
+            $('#subUnitLabel').text($('#editSubUnit').val());
+        });
+        
+        // Save Item Changes
+        $('#saveItemChanges').click(function() {
+            const itemId = $('#editItemId').val();
+            const formData = {
+                name: $('#editName').val(),
+                description: $('#editDescription').val(),
+                main_unit: $('#editMainUnit').val(),
+                sub_unit: $('#editSubUnit').val(),
+                conversion_rate: $('#editConversionRate').val(),
+                purchase_price: $('#editPurchasePrice').val(),
+                selling_price: $('#editSellingPrice').val()
+            };
+            
+            $.ajax({
+                url: `/api/item/${itemId}/update`,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    $('#editItemModal').modal('hide');
+                    if (response.success) {
+                        alert('Item updated successfully!');
+                        location.reload();
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while updating the item.');
+                }
+            });
+        });
+        
+        // Activate/Deactivate Item
+        $('.activate-item, .deactivate-item').click(function() {
+            const itemId = $(this).data('id');
+            const action = $(this).hasClass('activate-item') ? 'activate' : 'deactivate';
+            
+            if (confirm(`Are you sure you want to ${action} this item?`)) {
+                $.post(`/api/item/${itemId}/${action}`, function(response) {
+                    if (response.success) {
+                        alert(`Item ${action}d successfully!`);
+                        location.reload();
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}
