@@ -336,6 +336,522 @@ def warehouse_inventory(warehouse_id):
                           warehouse=warehouse, 
                           inventory=inventory)
 
+# Invoice Management Routes
+@app.route('/invoices')
+@login_required
+def list_invoices():
+    """List all invoices"""
+    invoices = invoice_controller.get_all_invoices()
+    entities = supplier_customer_controller.get_all_entities()
+    funds = fund_controller.get_all_funds()
+    return render_template('invoices/list.html', 
+                          invoices=invoices,
+                          entities=entities,
+                          funds=funds)
+
+@app.route('/invoices/new-purchase', methods=['GET', 'POST'])
+@login_required
+def new_purchase_invoice():
+    """Create a new purchase invoice"""
+    if request.method == 'POST':
+        # Extract data from form
+        supplier_id = request.form['supplier_id']
+        warehouse_id = request.form['warehouse_id']
+        invoice_date = request.form['invoice_date']
+        due_date = request.form.get('due_date', None)
+        currency = request.form['currency']
+        exchange_rate = request.form['exchange_rate']
+        additional_costs = request.form.get('additional_costs', 0)
+        tax = request.form.get('tax', 0)
+        notes = request.form.get('notes', '')
+        
+        # Get items data from form arrays
+        item_ids = request.form.getlist('item_ids[]')
+        item_quantities = request.form.getlist('item_quantities[]')
+        item_units = request.form.getlist('item_units[]')
+        item_prices = request.form.getlist('item_prices[]')
+        
+        # Prepare items data for controller
+        items_data = []
+        for i in range(len(item_ids)):
+            items_data.append({
+                'item_id': item_ids[i],
+                'quantity': item_quantities[i],
+                'unit': item_units[i],
+                'price_per_unit': item_prices[i]
+            })
+        
+        # Create the invoice
+        success, result = invoice_controller.create_invoice(
+            invoice_type='purchase',
+            entity_id=supplier_id,
+            items_data=items_data,
+            warehouse_id=warehouse_id,
+            invoice_date=invoice_date,
+            due_date=due_date,
+            currency=currency,
+            exchange_rate=exchange_rate,
+            additional_costs=additional_costs,
+            tax=tax,
+            notes=notes
+        )
+        
+        if success:
+            # Record initial payment if requested
+            if 'record_payment' in request.form:
+                payment_amount = request.form['payment_amount']
+                payment_method = request.form['payment_method']
+                fund_id = request.form['fund_id']
+                
+                invoice_controller.record_payment(
+                    invoice_id=result.id,
+                    amount=payment_amount,
+                    payment_date=invoice_date,
+                    payment_method=payment_method,
+                    fund_id=fund_id,
+                    notes=f"Initial payment for invoice #{result.invoice_number}"
+                )
+            
+            flash('Purchase invoice created successfully', 'success')
+            return redirect(url_for('view_invoice', invoice_id=result.id))
+        else:
+            flash(f'Error creating invoice: {result}', 'danger')
+    
+    # GET request - display form
+    suppliers = supplier_customer_controller.get_suppliers()
+    warehouses = warehouse_controller.get_all_warehouses()
+    items = item_controller.get_all_items()
+    funds = fund_controller.get_all_funds()
+    
+    return render_template('invoices/new_purchase.html',
+                          suppliers=suppliers,
+                          warehouses=warehouses,
+                          items=items,
+                          funds=funds)
+
+@app.route('/invoices/new-sale', methods=['GET', 'POST'])
+@login_required
+def new_sales_invoice():
+    """Create a new sales invoice"""
+    if request.method == 'POST':
+        # Extract data from form
+        customer_id = request.form['customer_id']
+        warehouse_id = request.form['warehouse_id']
+        invoice_date = request.form['invoice_date']
+        due_date = request.form.get('due_date', None)
+        currency = request.form['currency']
+        exchange_rate = request.form['exchange_rate']
+        additional_costs = request.form.get('additional_costs', 0)
+        tax = request.form.get('tax', 0)
+        notes = request.form.get('notes', '')
+        
+        # Get items data from form arrays
+        item_ids = request.form.getlist('item_ids[]')
+        item_quantities = request.form.getlist('item_quantities[]')
+        item_units = request.form.getlist('item_units[]')
+        item_prices = request.form.getlist('item_prices[]')
+        
+        # Prepare items data for controller
+        items_data = []
+        for i in range(len(item_ids)):
+            items_data.append({
+                'item_id': item_ids[i],
+                'quantity': item_quantities[i],
+                'unit': item_units[i],
+                'price_per_unit': item_prices[i]
+            })
+        
+        # Create the invoice
+        success, result = invoice_controller.create_invoice(
+            invoice_type='sale',
+            entity_id=customer_id,
+            items_data=items_data,
+            warehouse_id=warehouse_id,
+            invoice_date=invoice_date,
+            due_date=due_date,
+            currency=currency,
+            exchange_rate=exchange_rate,
+            additional_costs=additional_costs,
+            tax=tax,
+            notes=notes
+        )
+        
+        if success:
+            # Record initial payment if requested
+            if 'record_payment' in request.form:
+                payment_amount = request.form['payment_amount']
+                payment_method = request.form['payment_method']
+                fund_id = request.form['fund_id']
+                
+                invoice_controller.record_payment(
+                    invoice_id=result.id,
+                    amount=payment_amount,
+                    payment_date=invoice_date,
+                    payment_method=payment_method,
+                    fund_id=fund_id,
+                    notes=f"Initial payment for invoice #{result.invoice_number}"
+                )
+            
+            flash('Sales invoice created successfully', 'success')
+            return redirect(url_for('view_invoice', invoice_id=result.id))
+        else:
+            flash(f'Error creating invoice: {result}', 'danger')
+    
+    # GET request - display form
+    customers = supplier_customer_controller.get_customers()
+    warehouses = warehouse_controller.get_all_warehouses()
+    items = item_controller.get_all_items()
+    funds = fund_controller.get_all_funds()
+    
+    return render_template('invoices/new_sale.html',
+                          customers=customers,
+                          warehouses=warehouses,
+                          items=items,
+                          funds=funds)
+
+@app.route('/invoices/<int:invoice_id>')
+@login_required
+def view_invoice(invoice_id):
+    """View invoice details"""
+    invoice = invoice_controller.get_invoice_by_id(invoice_id)
+    if not invoice:
+        flash('Invoice not found', 'danger')
+        return redirect(url_for('list_invoices'))
+    
+    funds = fund_controller.get_all_funds()
+    return render_template('invoices/view.html', invoice=invoice, funds=funds)
+
+@app.route('/invoices/<int:invoice_id>/payment', methods=['POST'])
+@login_required
+def record_payment(invoice_id):
+    """Record a payment for an invoice"""
+    amount = request.form['amount']
+    payment_date = request.form['payment_date']
+    payment_method = request.form['payment_method']
+    fund_id = request.form['fund_id']
+    notes = request.form.get('notes', '')
+    
+    success, result = invoice_controller.record_payment(
+        invoice_id=invoice_id,
+        amount=amount,
+        payment_date=payment_date,
+        payment_method=payment_method,
+        fund_id=fund_id,
+        notes=notes
+    )
+    
+    if success:
+        flash('Payment recorded successfully', 'success')
+    else:
+        flash(f'Error recording payment: {result}', 'danger')
+    
+    return redirect(url_for('view_invoice', invoice_id=invoice_id))
+
+@app.route('/invoices/<int:invoice_id>/cancel', methods=['POST'])
+@login_required
+def cancel_invoice(invoice_id):
+    """Cancel an invoice"""
+    success, result = invoice_controller.cancel_invoice(invoice_id)
+    
+    if success:
+        flash('Invoice cancelled successfully', 'success')
+    else:
+        flash(f'Error cancelling invoice: {result}', 'danger')
+    
+    return redirect(url_for('view_invoice', invoice_id=invoice_id))
+
+# API endpoint for stock data
+@app.route('/api/stock')
+@login_required
+def api_stock():
+    """API endpoint to get stock data for a warehouse"""
+    warehouse_id = request.args.get('warehouse_id')
+    if not warehouse_id:
+        return jsonify({'error': 'Warehouse ID is required'}), 400
+    
+    stock_data = {}
+    stock_items = warehouse_controller.get_warehouse_stock(warehouse_id)
+    
+    for stock in stock_items:
+        stock_data[stock.item_id] = {
+            'quantity': stock.quantity,
+            'item_name': stock.item.name,
+            'main_unit': stock.item.main_unit
+        }
+    
+    return jsonify(stock_data)
+
+# API endpoint for stock adjustment
+@app.route('/api/stock/adjust', methods=['POST'])
+@login_required
+def api_adjust_stock():
+    """API endpoint to adjust stock"""
+    item_id = request.form['item_id']
+    warehouse_id = request.form['warehouse_id']
+    quantity = float(request.form['quantity'])
+    adjustment_type = request.form['adjustment_type']
+    
+    try:
+        if adjustment_type == 'absolute':
+            success, result = item_controller.update_stock(
+                item_id=item_id,
+                warehouse_id=warehouse_id,
+                quantity_change=quantity,
+                is_absolute=True
+            )
+        elif adjustment_type == 'increase':
+            success, result = item_controller.update_stock(
+                item_id=item_id,
+                warehouse_id=warehouse_id,
+                quantity_change=quantity
+            )
+        elif adjustment_type == 'decrease':
+            success, result = item_controller.update_stock(
+                item_id=item_id,
+                warehouse_id=warehouse_id,
+                quantity_change=-quantity
+            )
+        else:
+            return jsonify({'success': False, 'message': 'Invalid adjustment type'})
+        
+        return jsonify({'success': success, 'message': str(result) if not success else 'Stock updated successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
+
+# Reports Routes
+@app.route('/reports')
+@login_required
+def reports_dashboard():
+    """Reports dashboard"""
+    # Get metrics for dashboard
+    now = datetime.now()
+    thirty_days_ago = now - timedelta(days=30)
+    
+    # Sales and purchases data for the chart
+    chart_data = report_controller.generate_sales_purchases_chart(start_date=thirty_days_ago, end_date=now)
+    
+    # Top selling items
+    top_items = report_controller.get_top_selling_items(start_date=thirty_days_ago, end_date=now, limit=5)
+    
+    # Get financial summary
+    financial = report_controller.get_financial_summary(start_date=thirty_days_ago, end_date=now)
+    
+    # Get inventory status
+    inventory = report_controller.get_inventory_status()
+    
+    # Get receivables and payables
+    receivables_payables = report_controller.get_receivables_payables_summary()
+    
+    # Main metrics
+    metrics = {
+        'total_sales': financial['total_revenue'],
+        'total_purchases': financial['cost_of_goods'],
+        'inventory_value': inventory['total_value'],
+        'net_profit': financial['net_profit']
+    }
+    
+    return render_template('reports/dashboard.html',
+                          metrics=metrics,
+                          chart_data=chart_data,
+                          top_items=top_items,
+                          financial=financial,
+                          inventory=inventory,
+                          receivables_payables=receivables_payables)
+
+@app.route('/reports/sales')
+@login_required
+def sales_report():
+    """Sales report"""
+    # Get filter parameters
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    customer_id = request.args.get('customer_id')
+    status = request.args.get('status')
+    
+    # Generate report data
+    report_data = report_controller.generate_sales_report(
+        start_date=start_date,
+        end_date=end_date,
+        customer_id=customer_id,
+        status=status
+    )
+    
+    # Get customers for filters
+    customers = supplier_customer_controller.get_customers()
+    
+    # Build filters object for template
+    filters = {
+        'start_date': start_date,
+        'end_date': end_date,
+        'customer_id': customer_id,
+        'status': status
+    }
+    
+    return render_template('reports/sales.html',
+                          summary=report_data['summary'],
+                          invoices=report_data['invoices'],
+                          top_customers=report_data['top_customers'],
+                          top_products=report_data['top_products'],
+                          sales_by_month=report_data['sales_by_month'],
+                          chart_data=report_data['chart_data'],
+                          customers=customers,
+                          filters=filters)
+
+@app.route('/reports/inventory')
+@login_required
+def inventory_report():
+    """Inventory report"""
+    # Get filter parameters
+    warehouse_id = request.args.get('warehouse_id')
+    stock_status = request.args.get('stock_status')
+    sort_by = request.args.get('sort_by', 'name')
+    
+    # Generate report data
+    report_data = report_controller.generate_inventory_report(
+        warehouse_id=warehouse_id,
+        stock_status=stock_status,
+        sort_by=sort_by
+    )
+    
+    # Get warehouses for filters
+    warehouses = warehouse_controller.get_all_warehouses()
+    
+    # Build filters object for template
+    filters = {
+        'warehouse_id': warehouse_id,
+        'stock_status': stock_status,
+        'sort_by': sort_by
+    }
+    
+    return render_template('reports/inventory.html',
+                          summary=report_data['summary'],
+                          inventory_items=report_data['items'],
+                          value_distribution=report_data['value_distribution'],
+                          warehouse_summary=report_data['warehouse_summary'],
+                          charts=report_data['charts'],
+                          warehouses=warehouses,
+                          filters=filters)
+
+@app.route('/reports/financial')
+@login_required
+def financial_report():
+    """Financial report"""
+    # Get filter parameters
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    currency = request.args.get('currency', 'USD')
+    fund_id = request.args.get('fund_id')
+    
+    # Generate report data
+    report_data = report_controller.generate_financial_report(
+        start_date=start_date,
+        end_date=end_date,
+        currency=currency,
+        fund_id=fund_id
+    )
+    
+    # Get funds for filters
+    funds = fund_controller.get_all_funds()
+    
+    # Build filters object for template
+    filters = {
+        'start_date': start_date,
+        'end_date': end_date,
+        'currency': currency,
+        'fund_id': fund_id
+    }
+    
+    return render_template('reports/financial.html',
+                          summary=report_data['summary'],
+                          income_statement=report_data['income_statement'],
+                          fund_balances=report_data['fund_balances'],
+                          total_fund_balance=report_data['total_fund_balance'],
+                          expense_categories=report_data['expense_categories'],
+                          monthly_trend=report_data['monthly_trend'],
+                          funds=funds,
+                          filters=filters)
+
+@app.route('/reports/receivables-payables')
+@login_required
+def receivables_payables_report():
+    """Receivables and payables report"""
+    # Generate report data
+    report_data = report_controller.generate_receivables_payables_report()
+    
+    return render_template('reports/receivables_payables.html',
+                          report_data=report_data)
+
+# Export routes
+@app.route('/reports/sales/export')
+@login_required
+def export_sales_report():
+    """Export sales report to Excel"""
+    # Get filter parameters from request
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    customer_id = request.args.get('customer_id')
+    status = request.args.get('status')
+    
+    # Generate report data
+    report_data = report_controller.generate_sales_report(
+        start_date=start_date,
+        end_date=end_date,
+        customer_id=customer_id,
+        status=status
+    )
+    
+    # Export to Excel
+    file_path = report_controller.export_to_excel(report_data, 'sales_report')
+    
+    # Return file for download
+    return send_file(file_path, as_attachment=True)
+
+@app.route('/reports/inventory/export')
+@login_required
+def export_inventory_report():
+    """Export inventory report to Excel"""
+    # Get filter parameters
+    warehouse_id = request.args.get('warehouse_id')
+    stock_status = request.args.get('stock_status')
+    sort_by = request.args.get('sort_by', 'name')
+    
+    # Generate report data
+    report_data = report_controller.generate_inventory_report(
+        warehouse_id=warehouse_id,
+        stock_status=stock_status,
+        sort_by=sort_by
+    )
+    
+    # Export to Excel
+    file_path = report_controller.export_to_excel(report_data, 'inventory_report')
+    
+    # Return file for download
+    return send_file(file_path, as_attachment=True)
+
+@app.route('/reports/financial/export')
+@login_required
+def export_financial_report():
+    """Export financial report to Excel"""
+    # Get filter parameters
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    currency = request.args.get('currency', 'USD')
+    fund_id = request.args.get('fund_id')
+    
+    # Generate report data
+    report_data = report_controller.generate_financial_report(
+        start_date=start_date,
+        end_date=end_date,
+        currency=currency,
+        fund_id=fund_id
+    )
+    
+    # Export to Excel
+    file_path = report_controller.export_to_excel(report_data, 'financial_report')
+    
+    # Return file for download
+    return send_file(file_path, as_attachment=True)
+
 # Define more routes for other functionality...
 
 # API endpoints for AJAX operations

@@ -1,0 +1,442 @@
+{% extends 'base.html' %}
+
+{% block title %}Sales Report - ASSI Warehouse Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('reports_dashboard') }}">Reports</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Sales Report</li>
+                </ol>
+            </nav>
+            <h1 class="h3">
+                <i class="fas fa-chart-line me-2"></i> Sales Report
+            </h1>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <i class="fas fa-filter me-2"></i> Filter Options
+                </div>
+                <div class="card-body">
+                    <form method="get" id="report-filter-form">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="start_date" class="form-label">Start Date</label>
+                                <input type="date" class="form-control" id="start_date" name="start_date" value="{{ filters.start_date }}">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="end_date" class="form-label">End Date</label>
+                                <input type="date" class="form-control" id="end_date" name="end_date" value="{{ filters.end_date }}">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="customer_id" class="form-label">Customer</label>
+                                <select class="form-select" id="customer_id" name="customer_id">
+                                    <option value="">All Customers</option>
+                                    {% for customer in customers %}
+                                    <option value="{{ customer.id }}" {{ 'selected' if filters.customer_id|int == customer.id else '' }}>
+                                        {{ customer.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select" id="status" name="status">
+                                    <option value="">All Statuses</option>
+                                    <option value="pending" {{ 'selected' if filters.status == 'pending' else '' }}>Pending</option>
+                                    <option value="paid" {{ 'selected' if filters.status == 'paid' else '' }}>Paid</option>
+                                    <option value="partially_paid" {{ 'selected' if filters.status == 'partially_paid' else '' }}>Partially Paid</option>
+                                    <option value="cancelled" {{ 'selected' if filters.status == 'cancelled' else '' }}>Cancelled</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-secondary" id="reset-filters">
+                                <i class="fas fa-redo me-1"></i> Reset Filters
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-1"></i> Apply Filters
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Summary Metrics -->
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <div class="display-4 text-primary mb-2">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <h5 class="card-title">Total Sales</h5>
+                    <h2 class="mb-0">${{ summary.total_sales|round(2) }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <div class="display-4 text-success mb-2">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <h5 class="card-title">Paid Amount</h5>
+                    <h2 class="mb-0">${{ summary.paid_amount|round(2) }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <div class="display-4 text-warning mb-2">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <h5 class="card-title">Outstanding</h5>
+                    <h2 class="mb-0">${{ summary.outstanding_amount|round(2) }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <div class="display-4 text-info mb-2">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h5 class="card-title">Total Invoices</h5>
+                    <h2 class="mb-0">{{ summary.invoice_count }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Sales Chart -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <i class="fas fa-chart-bar me-2"></i> Sales Trend
+                </div>
+                <div class="card-body">
+                    <canvas id="salesTrendChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Top Customers -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <i class="fas fa-users me-2"></i> Top Customers
+                </div>
+                <div class="card-body">
+                    {% if top_customers %}
+                    <div class="list-group list-group-flush">
+                        {% for customer in top_customers %}
+                        <div class="list-group-item border-0 px-0">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0">{{ customer.name }}</h6>
+                                    <small class="text-muted">{{ customer.invoice_count }} invoices</small>
+                                </div>
+                                <span class="text-primary">${{ customer.total|round(2) }}</span>
+                            </div>
+                            <div class="progress mt-2" style="height: 6px;">
+                                <div class="progress-bar" role="progressbar" style="width: {{ customer.percentage }}%;" 
+                                     aria-valuenow="{{ customer.percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> No customer data available.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Sales Data Table -->
+        <div class="col">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fas fa-table me-2"></i> Sales Data
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="printReport()">
+                            <i class="fas fa-print me-1"></i> Print
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="exportToExcel()">
+                            <i class="fas fa-file-excel me-1"></i> Export to Excel
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if invoices %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped" id="sales-table">
+                            <thead>
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Date</th>
+                                    <th>Customer</th>
+                                    <th>Total</th>
+                                    <th>Paid</th>
+                                    <th>Balance</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for invoice in invoices %}
+                                <tr>
+                                    <td>{{ invoice.invoice_number }}</td>
+                                    <td>{{ invoice.invoice_date.strftime('%Y-%m-%d') }}</td>
+                                    <td>{{ invoice.entity.name }}</td>
+                                    <td>{{ invoice.currency }} {{ invoice.total_amount }}</td>
+                                    <td>{{ invoice.currency }} {{ invoice.calculate_paid_amount() }}</td>
+                                    <td>{{ invoice.currency }} {{ invoice.calculate_remaining_amount() }}</td>
+                                    <td>
+                                        {% if invoice.status == 'pending' %}
+                                        <span class="badge bg-warning">Pending</span>
+                                        {% elif invoice.status == 'paid' %}
+                                        <span class="badge bg-success">Paid</span>
+                                        {% elif invoice.status == 'partially_paid' %}
+                                        <span class="badge bg-info">Partially Paid</span>
+                                        {% elif invoice.status == 'cancelled' %}
+                                        <span class="badge bg-danger">Cancelled</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('view_invoice', invoice_id=invoice.id) }}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> No sales data found for the selected filters.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Products Table -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <i class="fas fa-star me-2"></i> Top Selling Products
+                </div>
+                <div class="card-body">
+                    {% if top_products %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Product</th>
+                                    <th class="text-center">Quantity</th>
+                                    <th class="text-end">Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in top_products %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>{{ product.name }}</td>
+                                    <td class="text-center">{{ product.quantity }} {{ product.unit }}</td>
+                                    <td class="text-end">${{ product.revenue|round(2) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> No product data available.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales by Month -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <i class="fas fa-calendar-alt me-2"></i> Sales by Month
+                </div>
+                <div class="card-body">
+                    {% if sales_by_month %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th class="text-center">Invoices</th>
+                                    <th class="text-end">Sales</th>
+                                    <th class="text-end">Compared to Previous</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for month in sales_by_month %}
+                                <tr>
+                                    <td>{{ month.month }}</td>
+                                    <td class="text-center">{{ month.invoice_count }}</td>
+                                    <td class="text-end">${{ month.total|round(2) }}</td>
+                                    <td class="text-end">
+                                        {% if month.change > 0 %}
+                                        <span class="text-success">
+                                            <i class="fas fa-arrow-up"></i> {{ month.change }}%
+                                        </span>
+                                        {% elif month.change < 0 %}
+                                        <span class="text-danger">
+                                            <i class="fas fa-arrow-down"></i> {{ month.change|abs }}%
+                                        </span>
+                                        {% else %}
+                                        <span class="text-secondary">
+                                            <i class="fas fa-equals"></i> 0%
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> No monthly data available.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+<script>
+    // Initialize date range if not set
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!document.getElementById('start_date').value) {
+            // Set default to 30 days ago
+            var thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            document.getElementById('start_date').value = thirtyDaysAgo.toISOString().split('T')[0];
+        }
+        
+        if (!document.getElementById('end_date').value) {
+            // Set default to today
+            var today = new Date();
+            document.getElementById('end_date').value = today.toISOString().split('T')[0];
+        }
+    });
+    
+    // Reset filters
+    document.getElementById('reset-filters').addEventListener('click', function() {
+        document.getElementById('start_date').value = '';
+        document.getElementById('end_date').value = '';
+        document.getElementById('customer_id').value = '';
+        document.getElementById('status').value = '';
+        document.getElementById('report-filter-form').submit();
+    });
+    
+    // Print report
+    function printReport() {
+        window.print();
+    }
+    
+    // Export to Excel
+    function exportToExcel() {
+        // Redirect to the export endpoint with current filters
+        var filters = new URLSearchParams(window.location.search);
+        window.location.href = "{{ url_for('export_sales_report') }}?" + filters.toString();
+    }
+    
+    // Sales Trend Chart
+    var salesCtx = document.getElementById('salesTrendChart').getContext('2d');
+    var salesChart = new Chart(salesCtx, {
+        type: 'line',
+        data: {
+            labels: {{ chart_data.labels|tojson }},
+            datasets: [
+                {
+                    label: 'Sales',
+                    data: {{ chart_data.values|tojson }},
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.1
+                }
+            ]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        label: function(context) {
+                            return 'Sales: $' + context.raw.toFixed(2);
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value;
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Amount'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index',
+            },
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+</script>
+{% endblock %}

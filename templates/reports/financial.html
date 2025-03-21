@@ -1,0 +1,482 @@
+{% extends 'base.html' %}
+
+{% block title %}Financial Report - ASSI Warehouse Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('reports_dashboard') }}">Reports</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Financial Report</li>
+                </ol>
+            </nav>
+            <h1 class="h3">
+                <i class="fas fa-file-invoice-dollar me-2"></i> Financial Report
+            </h1>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <i class="fas fa-filter me-2"></i> Filter Options
+                </div>
+                <div class="card-body">
+                    <form method="get" id="report-filter-form">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="start_date" class="form-label">Start Date</label>
+                                <input type="date" class="form-control" id="start_date" name="start_date" value="{{ filters.start_date }}">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="end_date" class="form-label">End Date</label>
+                                <input type="date" class="form-control" id="end_date" name="end_date" value="{{ filters.end_date }}">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="currency" class="form-label">Currency</label>
+                                <select class="form-select" id="currency" name="currency">
+                                    <option value="USD" {{ 'selected' if filters.currency == 'USD' else '' }}>USD (US Dollar)</option>
+                                    <option value="EUR" {{ 'selected' if filters.currency == 'EUR' else '' }}>EUR (Euro)</option>
+                                    <option value="GBP" {{ 'selected' if filters.currency == 'GBP' else '' }}>GBP (British Pound)</option>
+                                    <option value="SYP" {{ 'selected' if filters.currency == 'SYP' else '' }}>SYP (Syrian Pound)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="fund_id" class="form-label">Fund</label>
+                                <select class="form-select" id="fund_id" name="fund_id">
+                                    <option value="">All Funds</option>
+                                    {% for fund in funds %}
+                                    <option value="{{ fund.id }}" {{ 'selected' if filters.fund_id|int == fund.id else '' }}>
+                                        {{ fund.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-secondary" id="reset-filters">
+                                <i class="fas fa-redo me-1"></i> Reset Filters
+                            </button>
+                            <div class="btn-group">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search me-1"></i> Apply Filters
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" onclick="exportToExcel()">
+                                    <i class="fas fa-file-excel me-1"></i> Export to Excel
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="printReport()">
+                                    <i class="fas fa-print me-1"></i> Print
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Summary Metrics -->
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <div class="display-4 text-primary mb-2">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <h5 class="card-title">Total Revenue</h5>
+                    <h2 class="mb-0">{{ summary.currency }} {{ summary.total_revenue|round(2) }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <div class="display-4 text-danger mb-2">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h5 class="card-title">Total Expenses</h5>
+                    <h2 class="mb-0">{{ summary.currency }} {{ summary.total_expenses|round(2) }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <div class="display-4 {% if summary.net_profit >= 0 %}text-success{% else %}text-danger{% endif %} mb-2">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h5 class="card-title">Net Profit</h5>
+                    <h2 class="mb-0">{{ summary.currency }} {{ summary.net_profit|round(2) }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <div class="display-4 {% if summary.profit_margin >= 0 %}text-success{% else %}text-danger{% endif %} mb-2">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <h5 class="card-title">Profit Margin</h5>
+                    <h2 class="mb-0">{{ summary.profit_margin|round(2) }}%</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Income Statement -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <i class="fas fa-file-invoice me-2"></i> Income Statement
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-borderless table-hover">
+                            <tbody>
+                                <!-- Revenue Section -->
+                                <tr class="table-light">
+                                    <td colspan="2"><strong>Revenue</strong></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left: 20px;">Sales Revenue</td>
+                                    <td class="text-end">{{ summary.currency }} {{ income_statement.sales_revenue|round(2) }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left: 20px;">Other Revenue</td>
+                                    <td class="text-end">{{ summary.currency }} {{ income_statement.other_revenue|round(2) }}</td>
+                                </tr>
+                                <tr class="fw-bold">
+                                    <td>Total Revenue</td>
+                                    <td class="text-end">{{ summary.currency }} {{ income_statement.total_revenue|round(2) }}</td>
+                                </tr>
+                                
+                                <!-- Cost of Goods Sold -->
+                                <tr class="table-light">
+                                    <td colspan="2"><strong>Cost of Goods Sold</strong></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left: 20px;">Purchases</td>
+                                    <td class="text-end">{{ summary.currency }} {{ income_statement.purchases|round(2) }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left: 20px;">Inventory Adjustment</td>
+                                    <td class="text-end">{{ summary.currency }} {{ income_statement.inventory_adjustment|round(2) }}</td>
+                                </tr>
+                                <tr class="fw-bold">
+                                    <td>Total Cost of Goods Sold</td>
+                                    <td class="text-end">{{ summary.currency }} {{ income_statement.total_cogs|round(2) }}</td>
+                                </tr>
+                                
+                                <!-- Gross Profit -->
+                                <tr class="fw-bold border-top">
+                                    <td>Gross Profit</td>
+                                    <td class="text-end 
+                                       {% if income_statement.gross_profit >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                        {{ summary.currency }} {{ income_statement.gross_profit|round(2) }}
+                                    </td>
+                                </tr>
+                                
+                                <!-- Operating Expenses -->
+                                <tr class="table-light">
+                                    <td colspan="2"><strong>Operating Expenses</strong></td>
+                                </tr>
+                                {% for expense in income_statement.expenses %}
+                                <tr>
+                                    <td style="padding-left: 20px;">{{ expense.name }}</td>
+                                    <td class="text-end">{{ summary.currency }} {{ expense.amount|round(2) }}</td>
+                                </tr>
+                                {% endfor %}
+                                <tr class="fw-bold">
+                                    <td>Total Operating Expenses</td>
+                                    <td class="text-end">{{ summary.currency }} {{ income_statement.total_operating_expenses|round(2) }}</td>
+                                </tr>
+                                
+                                <!-- Net Profit -->
+                                <tr class="fw-bold border-top table-active">
+                                    <td>Net Profit</td>
+                                    <td class="text-end 
+                                       {% if income_statement.net_profit >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                        {{ summary.currency }} {{ income_statement.net_profit|round(2) }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Revenue & Expenses Pie Chart -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <i class="fas fa-chart-pie me-2"></i> Revenue & Expenses
+                </div>
+                <div class="card-body">
+                    <canvas id="revenueExpensesChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Monthly Trend -->
+        <div class="col">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <i class="fas fa-chart-line me-2"></i> Monthly Financial Trend
+                </div>
+                <div class="card-body">
+                    <canvas id="monthlyTrendChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Fund Balances -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <i class="fas fa-wallet me-2"></i> Fund Balances
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Fund</th>
+                                    <th>Currency</th>
+                                    <th class="text-end">Current Balance</th>
+                                    <th class="text-end">Converted to {{ summary.currency }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for fund in fund_balances %}
+                                <tr>
+                                    <td>{{ fund.name }}</td>
+                                    <td>{{ fund.currency }}</td>
+                                    <td class="text-end">{{ fund.currency }} {{ fund.balance|round(2) }}</td>
+                                    <td class="text-end">{{ summary.currency }} {{ fund.converted_balance|round(2) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr class="fw-bold table-light">
+                                    <td colspan="3">Total Balance</td>
+                                    <td class="text-end">{{ summary.currency }} {{ total_fund_balance|round(2) }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Expense Categories -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <i class="fas fa-tags me-2"></i> Expense Categories
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th class="text-center">Count</th>
+                                    <th class="text-end">Amount</th>
+                                    <th class="text-end">Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for category in expense_categories %}
+                                <tr>
+                                    <td>{{ category.name }}</td>
+                                    <td class="text-center">{{ category.count }}</td>
+                                    <td class="text-end">{{ summary.currency }} {{ category.amount|round(2) }}</td>
+                                    <td class="text-end">{{ category.percentage|round(2) }}%</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+<script>
+    // Initialize date range if not set
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!document.getElementById('start_date').value) {
+            // Set default to first day of current month
+            var date = new Date();
+            date.setDate(1);
+            document.getElementById('start_date').value = date.toISOString().split('T')[0];
+        }
+        
+        if (!document.getElementById('end_date').value) {
+            // Set default to today
+            var today = new Date();
+            document.getElementById('end_date').value = today.toISOString().split('T')[0];
+        }
+    });
+    
+    // Reset filters
+    document.getElementById('reset-filters').addEventListener('click', function() {
+        document.getElementById('start_date').value = '';
+        document.getElementById('end_date').value = '';
+        document.getElementById('currency').value = 'USD';
+        document.getElementById('fund_id').value = '';
+        document.getElementById('report-filter-form').submit();
+    });
+    
+    // Print report
+    function printReport() {
+        window.print();
+    }
+    
+    // Export to Excel
+    function exportToExcel() {
+        // Redirect to the export endpoint with current filters
+        var filters = new URLSearchParams(window.location.search);
+        window.location.href = "{{ url_for('export_financial_report') }}?" + filters.toString();
+    }
+    
+    // Revenue & Expenses Pie Chart
+    var revenueExpensesCtx = document.getElementById('revenueExpensesChart').getContext('2d');
+    var revenueExpensesChart = new Chart(revenueExpensesCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Revenue', 'Expenses'],
+            datasets: [{
+                data: [
+                    {{ income_statement.total_revenue }},
+                    {{ income_statement.total_operating_expenses + income_statement.total_cogs }}
+                ],
+                backgroundColor: [
+                    'rgba(75, 192, 192, 0.7)',
+                    'rgba(255, 99, 132, 0.7)',
+                ],
+                borderColor: [
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(255, 99, 132, 1)',
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            var label = context.label || '';
+                            var value = context.raw || 0;
+                            var total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            var percentage = Math.round((value / total) * 100);
+                            return label + ': {{ summary.currency }} ' + value.toFixed(2) + ' (' + percentage + '%)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Monthly Trend Chart
+    var monthlyTrendCtx = document.getElementById('monthlyTrendChart').getContext('2d');
+    var monthlyTrendChart = new Chart(monthlyTrendCtx, {
+        type: 'line',
+        data: {
+            labels: {{ monthly_trend.labels|tojson }},
+            datasets: [
+                {
+                    label: 'Revenue',
+                    data: {{ monthly_trend.revenue|tojson }},
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.1
+                },
+                {
+                    label: 'Expenses',
+                    data: {{ monthly_trend.expenses|tojson }},
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.1
+                },
+                {
+                    label: 'Net Profit',
+                    data: {{ monthly_trend.profit|tojson }},
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.0)',
+                    borderWidth: 2,
+                    tension: 0.1,
+                    borderDash: [5, 5]
+                }
+            ]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        label: function(context) {
+                            var label = context.dataset.label || '';
+                            var value = context.raw || 0;
+                            return label + ': {{ summary.currency }} ' + value.toFixed(2);
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    ticks: {
+                        callback: function(value) {
+                            return '{{ summary.currency }} ' + value;
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Amount'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Month'
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index',
+            },
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+</script>
+{% endblock %}

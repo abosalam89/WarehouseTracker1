@@ -1,0 +1,424 @@
+{% extends 'base.html' %}
+
+{% block title %}Inventory Report - ASSI Warehouse Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('reports_dashboard') }}">Reports</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Inventory Report</li>
+                </ol>
+            </nav>
+            <h1 class="h3">
+                <i class="fas fa-boxes me-2"></i> Inventory Report
+            </h1>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <i class="fas fa-filter me-2"></i> Filter Options
+                </div>
+                <div class="card-body">
+                    <form method="get" id="report-filter-form">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="warehouse_id" class="form-label">Warehouse</label>
+                                <select class="form-select" id="warehouse_id" name="warehouse_id">
+                                    <option value="">All Warehouses</option>
+                                    {% for warehouse in warehouses %}
+                                    <option value="{{ warehouse.id }}" {{ 'selected' if filters.warehouse_id|int == warehouse.id else '' }}>
+                                        {{ warehouse.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="stock_status" class="form-label">Stock Status</label>
+                                <select class="form-select" id="stock_status" name="stock_status">
+                                    <option value="">All Items</option>
+                                    <option value="in_stock" {{ 'selected' if filters.stock_status == 'in_stock' else '' }}>In Stock</option>
+                                    <option value="low_stock" {{ 'selected' if filters.stock_status == 'low_stock' else '' }}>Low Stock</option>
+                                    <option value="out_of_stock" {{ 'selected' if filters.stock_status == 'out_of_stock' else '' }}>Out of Stock</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="sort_by" class="form-label">Sort By</label>
+                                <select class="form-select" id="sort_by" name="sort_by">
+                                    <option value="name" {{ 'selected' if filters.sort_by == 'name' else '' }}>Name</option>
+                                    <option value="quantity_asc" {{ 'selected' if filters.sort_by == 'quantity_asc' else '' }}>Quantity (Low to High)</option>
+                                    <option value="quantity_desc" {{ 'selected' if filters.sort_by == 'quantity_desc' else '' }}>Quantity (High to Low)</option>
+                                    <option value="value_asc" {{ 'selected' if filters.sort_by == 'value_asc' else '' }}>Value (Low to High)</option>
+                                    <option value="value_desc" {{ 'selected' if filters.sort_by == 'value_desc' else '' }}>Value (High to Low)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-secondary" id="reset-filters">
+                                <i class="fas fa-redo me-1"></i> Reset Filters
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-1"></i> Apply Filters
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Summary Metrics -->
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <div class="display-4 text-primary mb-2">
+                        <i class="fas fa-cubes"></i>
+                    </div>
+                    <h5 class="card-title">Total Items</h5>
+                    <h2 class="mb-0">{{ summary.total_items }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <div class="display-4 text-success mb-2">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <h5 class="card-title">Total Value</h5>
+                    <h2 class="mb-0">${{ summary.total_value|round(2) }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <div class="display-4 text-warning mb-2">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h5 class="card-title">Low Stock Items</h5>
+                    <h2 class="mb-0">{{ summary.low_stock_count }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <div class="display-4 text-danger mb-2">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <h5 class="card-title">Out of Stock</h5>
+                    <h2 class="mb-0">{{ summary.out_of_stock_count }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Inventory Charts -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <i class="fas fa-chart-pie me-2"></i> Inventory Value by Warehouse
+                </div>
+                <div class="card-body">
+                    <canvas id="warehouseValueChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <i class="fas fa-chart-bar me-2"></i> Stock Status
+                </div>
+                <div class="card-body">
+                    <canvas id="stockStatusChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Inventory Data Table -->
+        <div class="col">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fas fa-table me-2"></i> Inventory Data
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="printReport()">
+                            <i class="fas fa-print me-1"></i> Print
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="exportToExcel()">
+                            <i class="fas fa-file-excel me-1"></i> Export to Excel
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if inventory_items %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped" id="inventory-table">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Description</th>
+                                    <th>Warehouse</th>
+                                    <th class="text-center">Quantity</th>
+                                    <th class="text-center">Unit</th>
+                                    <th class="text-end">Unit Value</th>
+                                    <th class="text-end">Total Value</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in inventory_items %}
+                                <tr class="{{ 'table-warning' if item.status == 'low_stock' else 'table-danger' if item.status == 'out_of_stock' else '' }}">
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ item.description }}</td>
+                                    <td>{{ item.warehouse_name }}</td>
+                                    <td class="text-center">{{ item.quantity }}</td>
+                                    <td class="text-center">{{ item.main_unit }}</td>
+                                    <td class="text-end">${{ item.purchase_price }}</td>
+                                    <td class="text-end">${{ item.total_value|round(2) }}</td>
+                                    <td>
+                                        {% if item.status == 'in_stock' %}
+                                        <span class="badge bg-success">In Stock</span>
+                                        {% elif item.status == 'low_stock' %}
+                                        <span class="badge bg-warning">Low Stock</span>
+                                        {% elif item.status == 'out_of_stock' %}
+                                        <span class="badge bg-danger">Out of Stock</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> No inventory data found for the selected filters.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Value Distribution Table -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <i class="fas fa-chart-pie me-2"></i> Inventory Value Distribution
+                </div>
+                <div class="card-body">
+                    {% if value_distribution %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th class="text-center">Item Count</th>
+                                    <th class="text-end">Total Value</th>
+                                    <th class="text-end">Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for category in value_distribution %}
+                                <tr>
+                                    <td>{{ category.range }}</td>
+                                    <td class="text-center">{{ category.item_count }}</td>
+                                    <td class="text-end">${{ category.value|round(2) }}</td>
+                                    <td class="text-end">{{ category.percentage|round(2) }}%</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> No value distribution data available.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Warehouses Table -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <i class="fas fa-warehouse me-2"></i> Warehouses Summary
+                </div>
+                <div class="card-body">
+                    {% if warehouse_summary %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Warehouse</th>
+                                    <th class="text-center">Items</th>
+                                    <th class="text-center">Unique Items</th>
+                                    <th class="text-end">Total Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for warehouse in warehouse_summary %}
+                                <tr>
+                                    <td>{{ warehouse.name }}</td>
+                                    <td class="text-center">{{ warehouse.total_quantity }}</td>
+                                    <td class="text-center">{{ warehouse.unique_items }}</td>
+                                    <td class="text-end">${{ warehouse.total_value|round(2) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> No warehouse summary data available.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+<script>
+    // Reset filters
+    document.getElementById('reset-filters').addEventListener('click', function() {
+        document.getElementById('warehouse_id').value = '';
+        document.getElementById('stock_status').value = '';
+        document.getElementById('sort_by').value = 'name';
+        document.getElementById('report-filter-form').submit();
+    });
+    
+    // Print report
+    function printReport() {
+        window.print();
+    }
+    
+    // Export to Excel
+    function exportToExcel() {
+        // Redirect to the export endpoint with current filters
+        var filters = new URLSearchParams(window.location.search);
+        window.location.href = "{{ url_for('export_inventory_report') }}?" + filters.toString();
+    }
+    
+    // Warehouse Value Chart
+    var warehouseValueCtx = document.getElementById('warehouseValueChart').getContext('2d');
+    var warehouseValueChart = new Chart(warehouseValueCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ charts.warehouse_value.labels|tojson }},
+            datasets: [{
+                data: {{ charts.warehouse_value.values|tojson }},
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(255, 99, 132, 0.7)',
+                    'rgba(255, 205, 86, 0.7)',
+                    'rgba(75, 192, 192, 0.7)',
+                    'rgba(153, 102, 255, 0.7)',
+                    'rgba(255, 159, 64, 0.7)',
+                    'rgba(201, 203, 207, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(255, 205, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(201, 203, 207, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            var label = context.label || '';
+                            var value = context.raw || 0;
+                            var total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            var percentage = Math.round((value / total) * 100);
+                            return label + ': $' + value.toFixed(2) + ' (' + percentage + '%)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Stock Status Chart
+    var stockStatusCtx = document.getElementById('stockStatusChart').getContext('2d');
+    var stockStatusChart = new Chart(stockStatusCtx, {
+        type: 'bar',
+        data: {
+            labels: ['In Stock', 'Low Stock', 'Out of Stock'],
+            datasets: [{
+                label: 'Number of Items',
+                data: [
+                    {{ summary.in_stock_count }},
+                    {{ summary.low_stock_count }},
+                    {{ summary.out_of_stock_count }}
+                ],
+                backgroundColor: [
+                    'rgba(75, 192, 192, 0.7)',
+                    'rgba(255, 205, 86, 0.7)',
+                    'rgba(255, 99, 132, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(255, 205, 86, 1)',
+                    'rgba(255, 99, 132, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Items'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Stock Status'
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

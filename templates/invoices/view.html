@@ -1,0 +1,376 @@
+{% extends 'base.html' %}
+
+{% block title %}Invoice Details - ASSI Warehouse Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('list_invoices') }}">Invoices</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ invoice.invoice_number }}</li>
+                </ol>
+            </nav>
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h3">
+                    {% if invoice.type == 'purchase' %}
+                    <i class="fas fa-shopping-cart me-2"></i>
+                    {% else %}
+                    <i class="fas fa-receipt me-2"></i>
+                    {% endif %}
+                    {{ invoice.type|capitalize }} Invoice: {{ invoice.invoice_number }}
+                    
+                    {% if invoice.status == 'pending' %}
+                    <span class="badge bg-warning ms-2">Pending</span>
+                    {% elif invoice.status == 'paid' %}
+                    <span class="badge bg-success ms-2">Paid</span>
+                    {% elif invoice.status == 'partially_paid' %}
+                    <span class="badge bg-info ms-2">Partially Paid</span>
+                    {% elif invoice.status == 'cancelled' %}
+                    <span class="badge bg-danger ms-2">Cancelled</span>
+                    {% endif %}
+                </h1>
+                <div class="btn-group">
+                    {% if invoice.status != 'cancelled' and invoice.status != 'paid' %}
+                    <button class="btn btn-primary" onclick="recordPayment()">
+                        <i class="fas fa-money-bill-wave me-2"></i> Record Payment
+                    </button>
+                    {% endif %}
+                    
+                    <button class="btn btn-success" onclick="printInvoice()">
+                        <i class="fas fa-print me-2"></i> Print
+                    </button>
+                    
+                    {% if invoice.status == 'pending' %}
+                    <button class="btn btn-danger" onclick="confirmCancel()">
+                        <i class="fas fa-times me-2"></i> Cancel Invoice
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <i class="fas fa-file-invoice me-2"></i> Invoice Details
+                </div>
+                <div class="card-body p-4" id="invoice-printable-area">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h4 class="mb-3">
+                                {% if invoice.type == 'purchase' %}
+                                <strong>Supplier:</strong>
+                                {% else %}
+                                <strong>Customer:</strong>
+                                {% endif %}
+                            </h4>
+                            <div class="border p-3 rounded">
+                                <p class="mb-1"><strong>{{ invoice.entity.name }}</strong></p>
+                                {% if invoice.entity.phone %}
+                                <p class="mb-1">Phone: {{ invoice.entity.phone }}</p>
+                                {% endif %}
+                                {% if invoice.entity.email %}
+                                <p class="mb-1">Email: {{ invoice.entity.email }}</p>
+                                {% endif %}
+                                {% if invoice.entity.address %}
+                                <p class="mb-1">Address: {{ invoice.entity.address }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <h4 class="mb-3"><strong>Invoice Information</strong></h4>
+                            <div class="border p-3 rounded">
+                                <p class="mb-1"><strong>Invoice #:</strong> {{ invoice.invoice_number }}</p>
+                                <p class="mb-1"><strong>Date:</strong> {{ invoice.invoice_date.strftime('%Y-%m-%d') }}</p>
+                                {% if invoice.due_date %}
+                                <p class="mb-1"><strong>Due Date:</strong> {{ invoice.due_date.strftime('%Y-%m-%d') }}</p>
+                                {% endif %}
+                                <p class="mb-1"><strong>Status:</strong> 
+                                    <span class="badge {% if invoice.status == 'pending' %}bg-warning{% elif invoice.status == 'paid' %}bg-success{% elif invoice.status == 'partially_paid' %}bg-info{% elif invoice.status == 'cancelled' %}bg-danger{% endif %}">
+                                        {{ invoice.status|capitalize|replace('_', ' ') }}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Item</th>
+                                            <th>Unit</th>
+                                            <th class="text-center">Quantity</th>
+                                            <th class="text-end">Price</th>
+                                            <th class="text-end">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in invoice.items %}
+                                        <tr>
+                                            <td>{{ item.item.name }}</td>
+                                            <td>{{ item.unit }}</td>
+                                            <td class="text-center">{{ item.quantity }}</td>
+                                            <td class="text-end">{{ invoice.currency }} {{ item.price_per_unit }}</td>
+                                            <td class="text-end">{{ invoice.currency }} {{ item.total_price }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="4" class="text-end"><strong>Subtotal:</strong></td>
+                                            <td class="text-end">{{ invoice.currency }} {{ invoice.total_amount - invoice.additional_costs - invoice.tax }}</td>
+                                        </tr>
+                                        {% if invoice.additional_costs > 0 %}
+                                        <tr>
+                                            <td colspan="4" class="text-end"><strong>Additional Costs:</strong></td>
+                                            <td class="text-end">{{ invoice.currency }} {{ invoice.additional_costs }}</td>
+                                        </tr>
+                                        {% endif %}
+                                        {% if invoice.tax > 0 %}
+                                        <tr>
+                                            <td colspan="4" class="text-end"><strong>Tax:</strong></td>
+                                            <td class="text-end">{{ invoice.currency }} {{ invoice.tax }}</td>
+                                        </tr>
+                                        {% endif %}
+                                        <tr class="table-primary">
+                                            <td colspan="4" class="text-end"><strong>Total:</strong></td>
+                                            <td class="text-end"><strong>{{ invoice.currency }} {{ invoice.total_amount }}</strong></td>
+                                        </tr>
+                                        <tr class="table-success">
+                                            <td colspan="4" class="text-end"><strong>Paid:</strong></td>
+                                            <td class="text-end">{{ invoice.currency }} {{ invoice.calculate_paid_amount() }}</td>
+                                        </tr>
+                                        <tr class="table-warning">
+                                            <td colspan="4" class="text-end"><strong>Balance Due:</strong></td>
+                                            <td class="text-end"><strong>{{ invoice.currency }} {{ invoice.calculate_remaining_amount() }}</strong></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if invoice.notes %}
+                    <div class="row mb-4">
+                        <div class="col">
+                            <h5>Notes</h5>
+                            <div class="border p-3 rounded">
+                                {{ invoice.notes }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <i class="fas fa-money-check-alt me-2"></i> Payment Information
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-6 fw-bold">Total Amount:</div>
+                        <div class="col-6 text-end">{{ invoice.currency }} {{ invoice.total_amount }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6 fw-bold">Paid Amount:</div>
+                        <div class="col-6 text-end">{{ invoice.currency }} {{ invoice.calculate_paid_amount() }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6 fw-bold">Balance Due:</div>
+                        <div class="col-6 text-end">{{ invoice.currency }} {{ invoice.calculate_remaining_amount() }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6 fw-bold">Payment Status:</div>
+                        <div class="col-6 text-end">
+                            <span class="badge {% if invoice.status == 'pending' %}bg-warning{% elif invoice.status == 'paid' %}bg-success{% elif invoice.status == 'partially_paid' %}bg-info{% elif invoice.status == 'cancelled' %}bg-danger{% endif %}">
+                                {{ invoice.status|capitalize|replace('_', ' ') }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    {% if invoice.status != 'cancelled' and invoice.status != 'paid' %}
+                    <div class="d-grid gap-2 mt-3">
+                        <button class="btn btn-primary" onclick="recordPayment()">
+                            <i class="fas fa-money-bill-wave me-2"></i> Record Payment
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <i class="fas fa-history me-2"></i> Payment History
+                </div>
+                <div class="card-body">
+                    {% if invoice.payments %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Method</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in invoice.payments %}
+                                <tr>
+                                    <td>{{ payment.payment_date.strftime('%Y-%m-%d') }}</td>
+                                    <td>{{ payment.payment_method|capitalize }}</td>
+                                    <td class="text-end">{{ invoice.currency }} {{ payment.amount }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> No payments recorded for this invoice.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="paymentModalLabel">
+                    <i class="fas fa-money-bill-wave me-2"></i> Record Payment
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="paymentForm" method="post" action="{{ url_for('record_payment', invoice_id=invoice.id) }}">
+                    <div class="mb-3">
+                        <label for="payment-amount" class="form-label">Amount <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">{{ invoice.currency }}</span>
+                            <input type="number" class="form-control" id="payment-amount" name="amount" 
+                                  step="0.01" min="0.01" max="{{ invoice.calculate_remaining_amount() }}" 
+                                  value="{{ invoice.calculate_remaining_amount() }}" required>
+                        </div>
+                        <small class="form-text text-muted">Maximum amount: {{ invoice.currency }} {{ invoice.calculate_remaining_amount() }}</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="payment-date" class="form-label">Payment Date <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="payment-date" name="payment_date" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="payment-method" class="form-label">Payment Method <span class="text-danger">*</span></label>
+                        <select class="form-select" id="payment-method" name="payment_method" required>
+                            <option value="cash">Cash</option>
+                            <option value="bank_transfer">Bank Transfer</option>
+                            <option value="check">Check</option>
+                            <option value="credit_card">Credit Card</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="payment-fund" class="form-label">Fund <span class="text-danger">*</span></label>
+                        <select class="form-select" id="payment-fund" name="fund_id" required>
+                            {% for fund in funds %}
+                            <option value="{{ fund.id }}">{{ fund.name }} ({{ fund.currency }} {{ fund.balance }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="payment-notes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="payment-notes" name="notes" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="paymentForm" class="btn btn-primary">Record Payment</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Invoice Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="cancelModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i> Cancel Invoice
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to cancel invoice <strong>{{ invoice.invoice_number }}</strong>?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-info-circle me-2"></i> 
+                    Cancelling this invoice will reverse all inventory and accounting effects. This action cannot be undone.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Keep Invoice</button>
+                <form id="cancelForm" method="post" action="{{ url_for('cancel_invoice', invoice_id=invoice.id) }}">
+                    <button type="submit" class="btn btn-danger">Yes, Cancel Invoice</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Set today's date as default for payment date
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set today's date as default
+        var today = new Date().toISOString().split('T')[0];
+        document.getElementById('payment-date').value = today;
+    });
+    
+    // Record payment modal
+    function recordPayment() {
+        var modal = new bootstrap.Modal(document.getElementById('paymentModal'));
+        modal.show();
+    }
+    
+    // Cancel invoice modal
+    function confirmCancel() {
+        var modal = new bootstrap.Modal(document.getElementById('cancelModal'));
+        modal.show();
+    }
+    
+    // Print invoice
+    function printInvoice() {
+        var printContents = document.getElementById('invoice-printable-area').innerHTML;
+        var originalContents = document.body.innerHTML;
+        
+        document.body.innerHTML = `
+            <div style="padding: 20px;">
+                <h1 style="text-align: center; margin-bottom: 20px;">{{ invoice.type|capitalize }} Invoice</h1>
+                ${printContents}
+            </div>
+        `;
+        
+        window.print();
+        document.body.innerHTML = originalContents;
+        location.reload();
+    }
+</script>
+{% endblock %}

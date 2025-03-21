@@ -1,0 +1,364 @@
+{% extends 'base.html' %}
+
+{% block title %}Invoices - ASSI Warehouse Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">
+            <i class="fas fa-file-invoice-dollar me-2"></i> Invoices
+        </h1>
+        <div class="btn-group">
+            <a href="{{ url_for('new_purchase_invoice') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i> New Purchase Invoice
+            </a>
+            <a href="{{ url_for('new_sales_invoice') }}" class="btn btn-success">
+                <i class="fas fa-plus me-2"></i> New Sales Invoice
+            </a>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fas fa-filter me-2"></i> Filter Invoices
+                    </div>
+                    <button class="btn btn-sm btn-outline-secondary" id="reset-filters">
+                        <i class="fas fa-redo me-1"></i> Reset
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="invoice-type" class="form-label">Type</label>
+                            <select class="form-select" id="invoice-type">
+                                <option value="all">All Types</option>
+                                <option value="purchase">Purchase</option>
+                                <option value="sale">Sale</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="status-filter" class="form-label">Status</label>
+                            <select class="form-select" id="status-filter">
+                                <option value="all">All Statuses</option>
+                                <option value="pending">Pending</option>
+                                <option value="paid">Paid</option>
+                                <option value="partially_paid">Partially Paid</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="entity" class="form-label">Supplier/Customer</label>
+                            <select class="form-select" id="entity">
+                                <option value="all">All</option>
+                                {% for entity in entities %}
+                                <option value="{{ entity.id }}">{{ entity.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="date-range" class="form-label">Date Range</label>
+                            <select class="form-select" id="date-range">
+                                <option value="all">All Time</option>
+                                <option value="today">Today</option>
+                                <option value="week">This Week</option>
+                                <option value="month">This Month</option>
+                                <option value="year">This Year</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <ul class="nav nav-tabs card-header-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#all-invoices" data-bs-toggle="tab">All Invoices</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#purchases" data-bs-toggle="tab">Purchases</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#sales" data-bs-toggle="tab">Sales</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="all-invoices">
+                    {% if invoices %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped" id="invoices-table">
+                            <thead>
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Entity</th>
+                                    <th>Total</th>
+                                    <th>Paid</th>
+                                    <th>Remaining</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for invoice in invoices %}
+                                <tr class="invoice-row" 
+                                    data-invoice-id="{{ invoice.id }}"
+                                    data-invoice-type="{{ invoice.type }}"
+                                    data-invoice-status="{{ invoice.status }}"
+                                    data-invoice-entity="{{ invoice.entity_id }}">
+                                    <td>{{ invoice.invoice_number }}</td>
+                                    <td>{{ invoice.invoice_date.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        {% if invoice.type == 'purchase' %}
+                                        <span class="badge bg-primary">Purchase</span>
+                                        {% else %}
+                                        <span class="badge bg-success">Sale</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ invoice.entity.name }}</td>
+                                    <td>{{ invoice.currency }} {{ invoice.total_amount }}</td>
+                                    <td>{{ invoice.currency }} {{ invoice.calculate_paid_amount() }}</td>
+                                    <td>{{ invoice.currency }} {{ invoice.calculate_remaining_amount() }}</td>
+                                    <td>
+                                        {% if invoice.status == 'pending' %}
+                                        <span class="badge bg-warning">Pending</span>
+                                        {% elif invoice.status == 'paid' %}
+                                        <span class="badge bg-success">Paid</span>
+                                        {% elif invoice.status == 'partially_paid' %}
+                                        <span class="badge bg-info">Partially Paid</span>
+                                        {% elif invoice.status == 'cancelled' %}
+                                        <span class="badge bg-danger">Cancelled</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{{ url_for('view_invoice', invoice_id=invoice.id) }}" class="btn btn-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            {% if invoice.status != 'cancelled' and invoice.status != 'paid' %}
+                                            <button type="button" class="btn btn-primary" 
+                                                    onclick="recordPayment({{ invoice.id }}, '{{ invoice.invoice_number }}')">
+                                                <i class="fas fa-money-bill-wave"></i>
+                                            </button>
+                                            {% endif %}
+                                            {% if invoice.status == 'pending' %}
+                                            <button type="button" class="btn btn-danger" 
+                                                    onclick="confirmCancel({{ invoice.id }}, '{{ invoice.invoice_number }}')">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> No invoices found. Create a new invoice to get started.
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="tab-pane fade" id="purchases">
+                    <!-- This will be filled with purchases only -->
+                </div>
+                <div class="tab-pane fade" id="sales">
+                    <!-- This will be filled with sales only -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="paymentModalLabel">
+                    <i class="fas fa-money-bill-wave me-2"></i> Record Payment
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="paymentForm" method="post" action="">
+                    <div class="mb-3">
+                        <label class="form-label">Invoice Number</label>
+                        <input type="text" class="form-control" id="payment-invoice-number" readonly>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="payment-amount" class="form-label">Amount <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text" id="payment-currency">$</span>
+                            <input type="number" class="form-control" id="payment-amount" name="amount" step="0.01" min="0.01" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="payment-date" class="form-label">Payment Date <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="payment-date" name="payment_date" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="payment-method" class="form-label">Payment Method <span class="text-danger">*</span></label>
+                        <select class="form-select" id="payment-method" name="payment_method" required>
+                            <option value="cash">Cash</option>
+                            <option value="bank_transfer">Bank Transfer</option>
+                            <option value="check">Check</option>
+                            <option value="credit_card">Credit Card</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="payment-fund" class="form-label">Fund <span class="text-danger">*</span></label>
+                        <select class="form-select" id="payment-fund" name="fund_id" required>
+                            {% for fund in funds %}
+                            <option value="{{ fund.id }}">{{ fund.name }} ({{ fund.currency }} {{ fund.balance }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="payment-notes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="payment-notes" name="notes" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="paymentForm" class="btn btn-primary">Record Payment</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Invoice Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="cancelModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i> Cancel Invoice
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to cancel invoice <span id="cancel-invoice-number" class="fw-bold"></span>?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-info-circle me-2"></i> 
+                    Cancelling an invoice will reverse all inventory and accounting effects. This action cannot be undone.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Keep Invoice</button>
+                <form id="cancelForm" method="post" action="">
+                    <button type="submit" class="btn btn-danger">Yes, Cancel Invoice</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Payment modal
+    function recordPayment(invoiceId, invoiceNumber) {
+        document.getElementById('payment-invoice-number').value = invoiceNumber;
+        document.getElementById('paymentForm').action = "/invoices/" + invoiceId + "/payment";
+        
+        // Set today's date as default
+        var today = new Date().toISOString().split('T')[0];
+        document.getElementById('payment-date').value = today;
+        
+        var modal = new bootstrap.Modal(document.getElementById('paymentModal'));
+        modal.show();
+    }
+    
+    // Cancel invoice modal
+    function confirmCancel(invoiceId, invoiceNumber) {
+        document.getElementById('cancel-invoice-number').textContent = invoiceNumber;
+        document.getElementById('cancelForm').action = "/invoices/" + invoiceId + "/cancel";
+        var modal = new bootstrap.Modal(document.getElementById('cancelModal'));
+        modal.show();
+    }
+    
+    // Filter invoices
+    function filterInvoices() {
+        var invoiceType = document.getElementById('invoice-type').value;
+        var statusFilter = document.getElementById('status-filter').value;
+        var entityFilter = document.getElementById('entity').value;
+        var dateRange = document.getElementById('date-range').value;
+        
+        var rows = document.querySelectorAll('.invoice-row');
+        rows.forEach(function(row) {
+            var showRow = true;
+            
+            // Type filter
+            if (invoiceType !== 'all' && row.dataset.invoiceType !== invoiceType) {
+                showRow = false;
+            }
+            
+            // Status filter
+            if (statusFilter !== 'all' && row.dataset.invoiceStatus !== statusFilter) {
+                showRow = false;
+            }
+            
+            // Entity filter
+            if (entityFilter !== 'all' && row.dataset.invoiceEntity !== entityFilter) {
+                showRow = false;
+            }
+            
+            // Apply date filter (date filtering logic would be more complex and require additional data)
+            // This is a simplified version
+            
+            row.style.display = showRow ? '' : 'none';
+        });
+    }
+    
+    // Set up filter events
+    document.getElementById('invoice-type').addEventListener('change', filterInvoices);
+    document.getElementById('status-filter').addEventListener('change', filterInvoices);
+    document.getElementById('entity').addEventListener('change', filterInvoices);
+    document.getElementById('date-range').addEventListener('change', filterInvoices);
+    
+    // Reset filters
+    document.getElementById('reset-filters').addEventListener('click', function() {
+        document.getElementById('invoice-type').value = 'all';
+        document.getElementById('status-filter').value = 'all';
+        document.getElementById('entity').value = 'all';
+        document.getElementById('date-range').value = 'all';
+        filterInvoices();
+    });
+    
+    // Tab functionality
+    document.querySelectorAll('a[data-bs-toggle="tab"]').forEach(function(tab) {
+        tab.addEventListener('shown.bs.tab', function(e) {
+            if (e.target.getAttribute('href') === '#purchases') {
+                // When switching to purchases tab, set filter to purchases only
+                document.getElementById('invoice-type').value = 'purchase';
+                filterInvoices();
+            } else if (e.target.getAttribute('href') === '#sales') {
+                // When switching to sales tab, set filter to sales only
+                document.getElementById('invoice-type').value = 'sale';
+                filterInvoices();
+            } else {
+                // All invoices tab
+                document.getElementById('invoice-type').value = 'all';
+                filterInvoices();
+            }
+        });
+    });
+</script>
+{% endblock %}
