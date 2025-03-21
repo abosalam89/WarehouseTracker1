@@ -1,0 +1,431 @@
+برومنت لتطوير برنامج ASSI Warehouse Management System بلغة Python
+الوصف العام للمشروع
+ASSI Warehouse Management System هو برنامج لإدارة المستودعات والمخازن، يتضمن واجهات عصرية، دعمًا متعدد اللغات (عربي/إنجليزي)، وإدارة الصناديق، المخزون، الفواتير، المصروفات، الدفعات الآجلة، وتقارير شاملة مثل الديون والمستحقات. يهدف إلى تبسيط العمليات المالية وإدارة المخزون بدقة.
+التقنيات المطلوبة
+لغة البرمجة: Python 3.11
+
+واجهة المستخدم: Tkinter مع ttkbootstrap لتصميم عصري
+
+قاعدة البيانات: SQLite مع SQLAlchemy (ORM)
+
+الرسوم البيانية: Matplotlib
+
+تصدير البيانات: Pandas لإنشاء ملفات Excel/PDF
+
+التشفير: hashlib لتشفير كلمات المرور
+
+دعم اللغات: gettext لتعدد اللغات
+
+الإشعارات: Plyer لإشعارات سطح المكتب
+خطوات الإنشاء التفصيلية
+1. إعداد البيئة والهيكلية الأساسية
+الخطوة 1.1: تثبيت المكتبات
+bash
+pip install tkinter ttkbootstrap sqlalchemy pandas matplotlib plyer
+
+الخطوة 1.2: إنشاء هيكل المشروع
+ASSI-WMS/
+│
+├── main.py                 # الملف الرئيسي لتشغيل البرنامج
+├── models/                 # نماذج قاعدة البيانات
+│   ├── __init__.py
+│   ├── user.py
+│   ├── fund.py
+│   ├── item.py
+│   ├── invoice.py
+│   ├── warehouse.py
+│   ├── expense.py
+│   ├── supplier_customer.py
+│   └── report.py
+├── views/                  # واجهات المستخدم
+│   ├── __init__.py
+│   ├── login.py
+│   ├── main_menu.py
+│   ├── funds.py
+│   ├── items.py
+│   ├── invoices.py
+│   ├── warehouses.py
+│   ├── expenses.py
+│   ├── suppliers_customers.py
+│   └── reports.py
+├── controllers/            # المنطق البرمجي
+│   ├── __init__.py
+│   ├── auth.py
+│   ├── fund_controller.py
+│   ├── item_controller.py
+│   ├── invoice_controller.py
+│   └── report_controller.py
+├── database/               # إعداد قاعدة البيانات
+│   ├── __init__.py
+│   └── db_setup.py
+├── translations/           # ملفات الترجمة
+│   ├── en_US/
+│   ├── ar_SA/
+│   └── __init__.py
+└── utils/                  # أدوات مساعدة
+    ├── __init__.py
+    ├── notifications.py
+    └── export.py
+
+2. إعداد قاعدة البيانات (SQLite + SQLAlchemy)
+الخطوة 2.1: إعداد قاعدة البيانات في database/db_setup.py
+python
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+# إعداد قاعدة البيانات
+engine = create_engine('sqlite:///assi_wms.db', echo=True)
+Base = declarative_base()
+
+# إعداد الجلسة
+Session = sessionmaker(bind=engine)
+session = Session()
+
+# لاحقًا، سيتم استدعاء Base.metadata.create_all(engine) لإنشاء الجداول
+
+الخطوة 2.2: نموذج المستخدم (models/user.py)
+python
+from sqlalchemy import Column, Integer, String, DateTime
+from database.db_setup import Base
+import hashlib
+from datetime import datetime
+
+class User(Base):
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key=True)
+    username = Column(String, unique=True, nullable=False)
+    password = Column(String, nullable=False)  # مشفر بـ SHA256
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    def set_password(self, password):
+        self.password = hashlib.sha256(password.encode()).hexdigest()
+
+    def check_password(self, password):
+        return self.password == hashlib.sha256(password.encode()).hexdigest()
+
+الخطوة 2.3: نموذج الصناديق (models/fund.py)
+python
+from sqlalchemy import Column, Integer, Float, String, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
+from database.db_setup import Base
+from datetime import datetime
+
+class Fund(Base):
+    __tablename__ = 'funds'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    balance = Column(Float, default=0.0)
+    currency = Column(String, default='USD')  # العملة (دولار/ليرة)
+    exchange_rate = Column(Float, default=1.0)  # سعر الصرف اليدوي
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+الخطوة 2.4: نموذج الأصناف (models/item.py)
+python
+class Item(Base):
+    __tablename__ = 'items'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    main_unit = Column(String, nullable=False)  # وحدة القياس الرئيسية (شوال)
+    sub_unit = Column(String, nullable=False)   # وحدة القياس الفرعية (كيلو)
+    conversion_rate = Column(Float, nullable=False)  # العلاقة بينهما (1 شوال = 50 كيلو)
+    purchase_price = Column(Float, nullable=False)  # سعر الشراء
+    selling_price = Column(Float, nullable=False)   # سعر البيع
+    stock = Column(Float, default=0.0)  # المخزون
+
+الخطوة 2.5: نموذج الفواتير والدفعات الآجلة (models/invoice.py)
+python
+class Invoice(Base):
+    __tablename__ = 'invoices'
+    id = Column(Integer, primary_key=True)
+    type = Column(String, nullable=False)  # شراء/بيع
+    total_amount = Column(Float, nullable=False)
+    currency = Column(String, default='USD')
+    exchange_rate = Column(Float, default=1.0)
+    additional_costs = Column(Float, default=0.0)  # تكاليف إضافية
+    tax = Column(Float, default=0.0)  # الضرائب
+    due_date = Column(DateTime)  # للدفع الآجل
+    status = Column(String, default='pending')  # الحالة (مدفوع/معلق)
+
+الخطوة 2.6: نموذج الموردين والعملاء (models/supplier_customer.py)
+python
+class SupplierCustomer(Base):
+    __tablename__ = 'suppliers_customers'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    type = Column(String, nullable=False)  # مورد/عميل
+    balance = Column(Float, default=0.0)  # الرصيد المستحق
+    currency = Column(String, default='USD')
+    exchange_rate = Column(Float, default=1.0)
+
+الخطوة 2.7: إنشاء الجداول
+في نهاية كل نموذج أو في ملف رئيسي:
+python
+from database.db_setup import Base, engine
+Base.metadata.create_all(engine)
+
+3. إنشاء واجهة تسجيل الدخول
+الخطوة 3.1: تصميم واجهة تسجيل الدخول (views/login.py)
+python
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
+from controllers.auth import AuthController
+
+class LoginView:
+    def __init__(self, root, switch_to_main_menu):
+        self.root = root
+        self.root.title("ASSI WMS - Login")
+        self.switch_to_main_menu = switch_to_main_menu
+        self.auth_controller = AuthController()
+
+        # إعداد الواجهة
+        self.frame = ttk.Frame(self.root, padding="20")
+        self.frame.pack(expand=True)
+
+        # حقل اسم المستخدم
+        ttk.Label(self.frame, text="Username").grid(row=0, column=0, padx=5, pady=5)
+        self.username_entry = ttk.Entry(self.frame)
+        self.username_entry.grid(row=0, column=1, padx=5, pady=5)
+
+        # حقل كلمة المرور
+        ttk.Label(self.frame, text="Password").grid(row=1, column=0, padx=5, pady=5)
+        self.password_entry = ttk.Entry(self.frame, show="*")
+        self.password_entry.grid(row=1, column=1, padx=5, pady=5)
+
+        # زر تسجيل الدخول
+        ttk.Button(self.frame, text="Login", command=self.login, bootstyle=SUCCESS).grid(row=2, columnspan=2, pady=10)
+
+    def login(self):
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+        if self.auth_controller.authenticate(username, password):
+            self.switch_to_main_menu()
+        else:
+            ttk.Label(self.frame, text="Invalid credentials", bootstyle=DANGER).grid(row=3, columnspan=2)
+
+الخطوة 3.2: منطق تسجيل الدخول (controllers/auth.py)
+python
+from database.db_setup import session
+from models.user import User
+
+class AuthController:
+    def authenticate(self, username, password):
+        user = session.query(User).filter_by(username=username).first()
+        if user and user.check_password(password):
+            return True
+        return False
+
+4. إنشاء القائمة الرئيسية
+الخطوة 4.1: تصميم القائمة الرئيسية (views/main_menu.py)
+python
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
+
+class MainMenuView:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("ASSI WMS - Main Menu")
+
+        # إعداد الواجهة
+        self.frame = ttk.Frame(self.root, padding="20")
+        self.frame.pack(expand=True)
+
+        # أزرار التنقل
+        buttons = [
+            ("Funds Management", self.open_funds),
+            ("Items Management", self.open_items),
+            ("Invoices", self.open_invoices),
+            ("Suppliers & Customers", self.open_suppliers_customers),
+            ("Reports", self.open_reports),
+        ]
+
+        for i, (text, command) in enumerate(buttons):
+            ttk.Button(self.frame, text=text, command=command, bootstyle=PRIMARY).grid(row=i, column=0, pady=5)
+
+    def open_funds(self):
+        pass  # سيتم ربطها بواجهة الصناديق
+
+    def open_items(self):
+        pass  # سيتم ربطها بواجهة الأصناف
+
+    def open_invoices(self):
+        pass  # سيتم ربطها بواجهة الفواتير
+
+    def open_suppliers_customers(self):
+        pass  # سيتم ربطها بواجهة الموردين/العملاء
+
+    def open_reports(self):
+        pass  # سيتم ربطها بواجهة التقارير
+
+5. إنشاء واجهة إدارة الصناديق
+الخطوة 5.1: تصميم واجهة الصناديق (views/funds.py)
+python
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
+
+class FundsView:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("ASSI WMS - Funds Management")
+
+        self.frame = ttk.Frame(self.root, padding="20")
+        self.frame.pack(expand=True)
+
+        # إضافة صندوق
+        ttk.Label(self.frame, text="Fund Name").grid(row=0, column=0)
+        self.fund_name_entry = ttk.Entry(self.frame)
+        self.fund_name_entry.grid(row=0, column=1)
+
+        ttk.Label(self.frame, text="Currency").grid(row=1, column=0)
+        self.currency_combobox = ttk.Combobox(self.frame, values=["USD", "SYP"])
+        self.currency_combobox.grid(row=1, column=1)
+
+        ttk.Label(self.frame, text="Exchange Rate").grid(row=2, column=0)
+        self.exchange_rate_entry = ttk.Entry(self.frame)
+        self.exchange_rate_entry.grid(row=2, column=1)
+
+        ttk.Button(self.frame, text="Add Fund", command=self.add_fund, bootstyle=SUCCESS).grid(row=3, columnspan=2)
+
+    def add_fund(self):
+        pass  # سيتم ربطها بمنطق إضافة الصندوق
+
+الخطوة 5.2: منطق إدارة الصناديق (controllers/fund_controller.py)
+python
+from database.db_setup import session
+from models.fund import Fund
+
+class FundController:
+    def add_fund(self, name, currency, exchange_rate):
+        fund = Fund(name=name, currency=currency, exchange_rate=float(exchange_rate))
+        session.add(fund)
+        session.commit()
+
+6. إنشاء واجهة إدارة الموردين والعملاء مع تسجيل الدفعات
+الخطوة 6.1: تصميم الواجهة (views/suppliers_customers.py)
+python
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
+
+class SuppliersCustomersView:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("ASSI WMS - Suppliers & Customers")
+
+        self.frame = ttk.Frame(self.root, padding="20")
+        self.frame.pack(expand=True)
+
+        # إضافة مورد/عميل
+        ttk.Label(self.frame, text="Name").grid(row=0, column=0)
+        self.name_entry = ttk.Entry(self.frame)
+        self.name_entry.grid(row=0, column=1)
+
+        ttk.Label(self.frame, text="Type").grid(row=1, column=0)
+        self.type_combobox = ttk.Combobox(self.frame, values=["Supplier", "Customer"])
+        self.type_combobox.grid(row=1, column=1)
+
+        ttk.Button(self.frame, text="Add", command=self.add_supplier_customer, bootstyle=SUCCESS).grid(row=2, columnspan=2)
+
+        # تسجيل دفعة
+        ttk.Label(self.frame, text="Payment Amount").grid(row=3, column=0)
+        self.payment_amount_entry = ttk.Entry(self.frame)
+        self.payment_amount_entry.grid(row=3, column=1)
+
+        ttk.Label(self.frame, text="Fund").grid(row=4, column=0)
+        self.fund_combobox = ttk.Combobox(self.frame, values=["Fund1", "Fund2"])  # سيتم ملؤها ديناميكيًا
+        self.fund_combobox.grid(row=4, column=1)
+
+        ttk.Button(self.frame, text="Record Payment", command=self.record_payment, bootstyle=INFO).grid(row=5, columnspan=2)
+
+    def add_supplier_customer(self):
+        pass  # سيتم ربطها بمنطق الإضافة
+
+    def record_payment(self):
+        pass  # سيتم ربطها بمنطق تسجيل الدفعة
+
+الخطوة 6.2: منطق إدارة الموردين/العملاء
+سيتم إضافة منطق مشابه للصناديق مع تحديث الرصيد بناءً على الدفعات.
+7. إنشاء تقارير الديون والمستحقات
+الخطوة 7.1: تصميم واجهة التقارير (views/reports.py)
+python
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+class ReportsView:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("ASSI WMS - Reports")
+
+        self.frame = ttk.Frame(self.root, padding="20")
+        self.frame.pack(expand=True)
+
+        ttk.Button(self.frame, text="Generate Debts Report", command=self.generate_debts_report).grid(row=0, column=0)
+
+        # إعداد الرسم البياني
+        self.fig, self.ax = plt.subplots()
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self.frame)
+        self.canvas.get_tk_widget().grid(row=1, columnspan=2)
+
+    def generate_debts_report(self):
+        # منطق إنشاء تقرير الديون
+        pass
+
+الخطوة 7.2: منطق التقارير (controllers/report_controller.py)
+python
+import pandas as pd
+from database.db_setup import session
+from models.supplier_customer import SupplierCustomer
+
+class ReportController:
+    def generate_debts_report(self):
+        suppliers = session.query(SupplierCustomer).filter_by(type="Supplier").all()
+        data = [{"Name": s.name, "Balance": s.balance} for s in suppliers]
+        df = pd.DataFrame(data)
+        df.to_excel("debts_report.xlsx")
+        return data
+
+8. إضافة دعم متعدد اللغات
+الخطوة 8.1: إعداد ملفات الترجمة
+استخدم gettext لإنشاء ملفات ترجمة في translations/ مع دعم العربية والإنجليزية.
+الخطوة 8.2: تطبيق الترجمة
+في كل واجهة، استخدم دالة _() لترجمة النصوص:
+python
+ttk.Label(self.frame, text=_("Username")).grid(row=0, column=0)
+
+9. إضافة الإشعارات
+الخطوة 9.1: إعداد الإشعارات (utils/notifications.py)
+python
+from plyer import notification
+
+def send_notification(title, message):
+    notification.notify(
+        title=title,
+        message=message,
+        timeout=10
+    )
+
+الخطوة 9.2: استخدام الإشعارات
+عند استحقاق دفعة، استدعِ:
+python
+send_notification("Payment Due", "A payment is due for supplier X.")
+
+10. تشغيل البرنامج (main.py)
+python
+import ttkbootstrap as ttk
+from views.login import LoginView
+from views.main_menu import MainMenuView
+
+def main():
+    root = ttk.Window(themename="flatly")
+    app = LoginView(root, lambda: switch_to_main_menu(root))
+    root.mainloop()
+
+def switch_to_main_menu(root):
+    for widget in root.winfo_children():
+        widget.destroy()
+    MainMenuView(root)
+
+if __name__ == "__main__":
+    main()
+
