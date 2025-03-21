@@ -1,93 +1,123 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
-{% block title %}Add Item - ASSI WMS{% endblock %}
+{% block title %}Add Item - ASSI Warehouse Management System{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3">Add New Item</h1>
-        <a href="{{ url_for('list_items') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back to Items
-        </a>
-    </div>
-    
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold">Item Details</h6>
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('list_items') }}">Items</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Add New</li>
+                </ol>
+            </nav>
+            <h1 class="h3">
+                <i class="fas fa-plus-circle me-2"></i> Add New Item
+            </h1>
         </div>
-        <div class="card-body">
-            <form method="post" action="{{ url_for('add_item') }}">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="name" class="form-label">Item Name</label>
-                        <input type="text" class="form-control" id="name" name="name" required>
-                        <div class="form-text">Enter a descriptive name for the item</div>
-                    </div>
-                    
-                    <div class="col-md-6 mb-3">
-                        <label for="description" class="form-label">Description</label>
-                        <textarea class="form-control" id="description" name="description" rows="1"></textarea>
-                        <div class="form-text">Optional item description</div>
-                    </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <i class="fas fa-box me-2"></i> Item Details
                 </div>
-                
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label for="main_unit" class="form-label">Main Unit</label>
-                        <input type="text" class="form-control" id="main_unit" name="main_unit" required>
-                        <div class="form-text">e.g., bag, box, container</div>
-                    </div>
-                    
-                    <div class="col-md-4 mb-3">
-                        <label for="sub_unit" class="form-label">Sub Unit</label>
-                        <input type="text" class="form-control" id="sub_unit" name="sub_unit" required>
-                        <div class="form-text">e.g., kg, liter, piece</div>
-                    </div>
-                    
-                    <div class="col-md-4 mb-3">
-                        <label for="conversion_rate" class="form-label">Conversion Rate</label>
-                        <div class="input-group">
-                            <span class="input-group-text">1 <span id="mainUnitLabel">unit</span> =</span>
-                            <input type="number" step="0.001" min="0.001" class="form-control" id="conversion_rate" name="conversion_rate" value="1" required>
-                            <span class="input-group-text"><span id="subUnitLabel">unit</span></span>
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('add_item') }}">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Item Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" required>
                         </div>
-                        <div class="form-text">How many sub units are in one main unit</div>
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="purchase_price" class="form-label">Purchase Price (USD)</label>
-                        <div class="input-group">
-                            <span class="input-group-text">$</span>
-                            <input type="number" step="0.01" min="0" class="form-control" id="purchase_price" name="purchase_price" required>
-                            <span class="input-group-text">per <span id="purchaseUnitLabel">unit</span></span>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="2"></textarea>
                         </div>
-                        <div class="form-text">The price you pay to acquire this item</div>
-                    </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="main_unit" class="form-label">Main Unit <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="main_unit" name="main_unit" required placeholder="e.g., bag, box, carton">
+                                <small class="form-text text-muted">Primary unit for inventory tracking</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="sub_unit" class="form-label">Sub Unit <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="sub_unit" name="sub_unit" required placeholder="e.g., kg, liter, piece">
+                                <small class="form-text text-muted">Smaller unit for subdivided quantities</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="conversion_rate" class="form-label">Conversion Rate <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="conversion_rate" name="conversion_rate" step="0.01" min="0.01" required>
+                            <small class="form-text text-muted">How many sub units equal one main unit (e.g., 1 bag = 50 kg)</small>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="purchase_price" class="form-label">Purchase Price <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="purchase_price" name="purchase_price" step="0.01" min="0" required>
+                                </div>
+                                <small class="form-text text-muted">Cost per main unit</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="selling_price" class="form-label">Selling Price <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="selling_price" name="selling_price" step="0.01" min="0" required>
+                                </div>
+                                <small class="form-text text-muted">Selling price per main unit</small>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('list_items') }}" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-times me-2"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i> Save Item
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <i class="fas fa-info-circle me-2"></i> Information
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">About Units</h5>
+                    <p>
+                        The <strong>Main Unit</strong> is the primary unit used for inventory tracking (e.g., box, bag, carton).
+                    </p>
+                    <p>
+                        The <strong>Sub Unit</strong> is the smaller unit used for measuring fractions of the main unit (e.g., kg, liter, piece).
+                    </p>
+                    <p>
+                        The <strong>Conversion Rate</strong> defines how many sub units make up one main unit. For example, if 1 bag = 50 kg, the conversion rate is 50.
+                    </p>
                     
-                    <div class="col-md-6 mb-3">
-                        <label for="selling_price" class="form-label">Selling Price (USD)</label>
-                        <div class="input-group">
-                            <span class="input-group-text">$</span>
-                            <input type="number" step="0.01" min="0" class="form-control" id="selling_price" name="selling_price" required>
-                            <span class="input-group-text">per <span id="sellingUnitLabel">unit</span></span>
-                        </div>
-                        <div class="form-text">The price you sell this item for</div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-lightbulb me-2"></i> 
+                        Once an item is created, you can add it to your warehouses with initial stock quantities.
                     </div>
+
+                    <h5 class="card-title mt-4">Price Settings</h5>
+                    <p>
+                        <strong>Purchase Price</strong>: The cost you pay per main unit.
+                    </p>
+                    <p>
+                        <strong>Selling Price</strong>: The price you charge per main unit.
+                    </p>
                 </div>
-                
-                <div class="form-check mb-3">
-                    <input type="checkbox" class="form-check-input" id="per_main_unit" name="per_main_unit" checked>
-                    <label class="form-check-label" for="per_main_unit">Prices are per main unit (rather than per sub unit)</label>
-                </div>
-                
-                <div class="mt-4 d-flex justify-content-end">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Create Item
-                    </button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
@@ -95,31 +125,21 @@
 
 {% block scripts %}
 <script>
-    $(document).ready(function() {
-        // Update unit labels when units change
-        function updateLabels() {
-            const mainUnit = $('#main_unit').val() || 'unit';
-            const subUnit = $('#sub_unit').val() || 'unit';
-            const perMainUnit = $('#per_main_unit').is(':checked');
-            
-            $('#mainUnitLabel').text(mainUnit);
-            $('#subUnitLabel').text(subUnit);
-            
-            if (perMainUnit) {
-                $('#purchaseUnitLabel').text(mainUnit);
-                $('#sellingUnitLabel').text(mainUnit);
-            } else {
-                $('#purchaseUnitLabel').text(subUnit);
-                $('#sellingUnitLabel').text(subUnit);
-            }
+    // Calculate selling price based on purchase price and a default margin
+    document.getElementById('purchase_price').addEventListener('change', function() {
+        var purchasePrice = parseFloat(this.value) || 0;
+        var defaultMargin = 0.2; // 20% margin
+        var sellingPrice = purchasePrice * (1 + defaultMargin);
+        document.getElementById('selling_price').value = sellingPrice.toFixed(2);
+    });
+    
+    // Validate conversion rate is greater than zero
+    document.querySelector('form').addEventListener('submit', function(e) {
+        var conversionRate = parseFloat(document.getElementById('conversion_rate').value);
+        if (conversionRate <= 0) {
+            e.preventDefault();
+            alert('Conversion rate must be greater than zero.');
         }
-        
-        // Set up event handlers
-        $('#main_unit, #sub_unit').on('input', updateLabels);
-        $('#per_main_unit').change(updateLabels);
-        
-        // Initial update
-        updateLabels();
     });
 </script>
 {% endblock %}

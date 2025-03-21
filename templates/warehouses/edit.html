@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Warehouse - ASSI Warehouse Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('list_warehouses') }}">Warehouses</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('view_warehouse', warehouse_id=warehouse.id) }}">{{ warehouse.name }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Edit</li>
+                </ol>
+            </nav>
+            <h1 class="h3">
+                <i class="fas fa-edit me-2"></i> Edit Warehouse
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <i class="fas fa-warehouse me-2"></i> Warehouse Details
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('edit_warehouse', warehouse_id=warehouse.id) }}">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Warehouse Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ warehouse.name }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="location" name="location" value="{{ warehouse.location or '' }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3">{{ warehouse.description or '' }}</textarea>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="is_active" name="is_active" {% if warehouse.is_active %}checked{% endif %}>
+                            <label class="form-check-label" for="is_active">Active</label>
+                            <small class="form-text text-muted d-block">Inactive warehouses will not be available for new operations but will still be visible in reports.</small>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('view_warehouse', warehouse_id=warehouse.id) }}" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-times me-2"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <i class="fas fa-info-circle me-2"></i> Information
+                </div>
+                <div class="card-body">
+                    <p>
+                        Edit the warehouse details as needed.
+                    </p>
+                    <p>
+                        If you deactivate a warehouse, it will not be available for new operations but will still be visible in reports and history.
+                    </p>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i> 
+                        Deactivating a warehouse with existing inventory will not remove the inventory, but it will prevent new stock from being added.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

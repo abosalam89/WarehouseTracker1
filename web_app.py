@@ -213,6 +213,129 @@ def add_item():
     
     return render_template('items/add.html')
 
+# Warehouse Management Routes
+@app.route('/warehouses')
+@login_required
+def list_warehouses():
+    """List all warehouses"""
+    warehouses = warehouse_controller.get_all_warehouses(active_only=False)
+    return render_template('warehouses/list.html', warehouses=warehouses)
+
+@app.route('/warehouses/add', methods=['GET', 'POST'])
+@login_required
+def add_warehouse():
+    """Add a new warehouse"""
+    if request.method == 'POST':
+        name = request.form['name']
+        location = request.form.get('location', '')
+        description = request.form.get('description', '')
+        
+        success, result = warehouse_controller.create_warehouse(
+            name=name,
+            location=location,
+            description=description
+        )
+        
+        if success:
+            flash('Warehouse added successfully', 'success')
+            return redirect(url_for('list_warehouses'))
+        else:
+            flash(f'Error adding warehouse: {result}', 'danger')
+    
+    return render_template('warehouses/add.html')
+
+@app.route('/warehouses/<int:warehouse_id>')
+@login_required
+def view_warehouse(warehouse_id):
+    """View warehouse details"""
+    warehouse = warehouse_controller.get_warehouse_by_id(warehouse_id)
+    if not warehouse:
+        flash('Warehouse not found', 'danger')
+        return redirect(url_for('list_warehouses'))
+    
+    # Get inventory information
+    inventory = warehouse_controller.get_warehouse_stock(warehouse_id)
+    inventory_count = len(inventory)
+    inventory_value = warehouse_controller.get_warehouse_inventory_value(warehouse_id)
+    
+    # Get low stock items
+    low_stock_items = []
+    for stock in inventory:
+        if stock.quantity < 10:  # Assuming 10 is the threshold for low stock
+            item_info = {
+                'name': stock.item.name,
+                'quantity': stock.quantity,
+                'main_unit': stock.item.main_unit
+            }
+            low_stock_items.append(item_info)
+    
+    return render_template('warehouses/view.html', 
+                           warehouse=warehouse,
+                           inventory_count=inventory_count,
+                           inventory_value=inventory_value,
+                           low_stock_items=low_stock_items)
+
+@app.route('/warehouses/<int:warehouse_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_warehouse(warehouse_id):
+    """Edit a warehouse"""
+    warehouse = warehouse_controller.get_warehouse_by_id(warehouse_id)
+    if not warehouse:
+        flash('Warehouse not found', 'danger')
+        return redirect(url_for('list_warehouses'))
+    
+    if request.method == 'POST':
+        name = request.form['name']
+        location = request.form.get('location', '')
+        description = request.form.get('description', '')
+        is_active = 'is_active' in request.form
+        
+        success, result = warehouse_controller.update_warehouse(
+            warehouse_id=warehouse_id,
+            name=name,
+            location=location,
+            description=description,
+            is_active=is_active
+        )
+        
+        if success:
+            flash('Warehouse updated successfully', 'success')
+            return redirect(url_for('view_warehouse', warehouse_id=warehouse_id))
+        else:
+            flash(f'Error updating warehouse: {result}', 'danger')
+    
+    return render_template('warehouses/edit.html', warehouse=warehouse)
+
+@app.route('/warehouses/<int:warehouse_id>/deactivate', methods=['POST'])
+@login_required
+def deactivate_warehouse(warehouse_id):
+    """Deactivate a warehouse"""
+    success, result = warehouse_controller.update_warehouse(
+        warehouse_id=warehouse_id,
+        is_active=False
+    )
+    
+    if success:
+        flash('Warehouse deactivated successfully', 'success')
+    else:
+        flash(f'Error deactivating warehouse: {result}', 'danger')
+    
+    return redirect(url_for('list_warehouses'))
+
+@app.route('/warehouses/<int:warehouse_id>/inventory')
+@login_required
+def warehouse_inventory(warehouse_id):
+    """View warehouse inventory"""
+    warehouse = warehouse_controller.get_warehouse_by_id(warehouse_id)
+    if not warehouse:
+        flash('Warehouse not found', 'danger')
+        return redirect(url_for('list_warehouses'))
+    
+    inventory = warehouse_controller.get_warehouse_stock(warehouse_id)
+    return render_template('warehouses/inventory.html', 
+                          warehouse=warehouse, 
+                          inventory=inventory)
+
 # Define more routes for other functionality...
 
 # API endpoints for AJAX operations

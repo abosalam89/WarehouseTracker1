@@ -1,0 +1,347 @@
+{% extends 'base.html' %}
+
+{% block title %}Item Details - ASSI Warehouse Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('list_items') }}">Items</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ item.name }}</li>
+                </ol>
+            </nav>
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h3">
+                    <i class="fas fa-box me-2"></i> {{ item.name }}
+                    {% if not item.is_active %}
+                    <span class="badge bg-danger ms-2">Inactive</span>
+                    {% endif %}
+                </h1>
+                <div class="btn-group">
+                    <a href="{{ url_for('edit_item', item_id=item.id) }}" class="btn btn-primary">
+                        <i class="fas fa-edit me-2"></i> Edit
+                    </a>
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addStockModal">
+                        <i class="fas fa-plus me-2"></i> Add Stock
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <i class="fas fa-info-circle me-2"></i> Item Information
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-4 fw-bold">ID:</div>
+                        <div class="col-8">{{ item.id }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4 fw-bold">Name:</div>
+                        <div class="col-8">{{ item.name }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4 fw-bold">Description:</div>
+                        <div class="col-8">{{ item.description or 'No description available' }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4 fw-bold">Status:</div>
+                        <div class="col-8">
+                            {% if item.is_active %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-danger">Inactive</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4 fw-bold">Created:</div>
+                        <div class="col-8">{{ item.created_at.strftime('%Y-%m-%d') }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4 fw-bold">Last Updated:</div>
+                        <div class="col-8">{{ item.updated_at.strftime('%Y-%m-%d') }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <i class="fas fa-ruler me-2"></i> Units & Pricing
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-4 fw-bold">Main Unit:</div>
+                        <div class="col-8">{{ item.main_unit }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4 fw-bold">Sub Unit:</div>
+                        <div class="col-8">{{ item.sub_unit }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4 fw-bold">Conversion:</div>
+                        <div class="col-8">1 {{ item.main_unit }} = {{ item.conversion_rate }} {{ item.sub_unit }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4 fw-bold">Purchase Price:</div>
+                        <div class="col-8">${{ item.purchase_price }} per {{ item.main_unit }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4 fw-bold">Selling Price:</div>
+                        <div class="col-8">${{ item.selling_price }} per {{ item.main_unit }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4 fw-bold">Margin:</div>
+                        <div class="col-8">
+                            {% set margin = ((item.selling_price - item.purchase_price) / item.purchase_price * 100) if item.purchase_price > 0 else 0 %}
+                            {{ margin|round(2) }}%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <i class="fas fa-chart-bar me-2"></i> Stock Summary
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-5 fw-bold">Total Stock:</div>
+                        <div class="col-7">{{ item.get_total_stock() }} {{ item.main_unit }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-5 fw-bold">In Sub Units:</div>
+                        <div class="col-7">{{ item.get_total_stock() * item.conversion_rate }} {{ item.sub_unit }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-5 fw-bold">Warehouses:</div>
+                        <div class="col-7">{{ item.stocks|length }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-5 fw-bold">Total Value:</div>
+                        <div class="col-7">${{ (item.get_total_stock() * item.purchase_price)|round(2) }}</div>
+                    </div>
+                    <div class="mt-3">
+                        <a href="#stock-tab" class="btn btn-outline-primary btn-sm w-100" data-bs-toggle="tab" role="tab" aria-controls="stock-tab" aria-selected="false">
+                            <i class="fas fa-warehouse me-2"></i> View Stock by Warehouse
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="stock-tab" data-bs-toggle="tab" data-bs-target="#stock" type="button" role="tab" aria-controls="stock" aria-selected="true">
+                                <i class="fas fa-warehouse me-2"></i> Stock
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">
+                                <i class="fas fa-history me-2"></i> History
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="stock" role="tabpanel" aria-labelledby="stock-tab">
+                            {% if item.stocks %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Warehouse</th>
+                                            <th>Location</th>
+                                            <th>Quantity ({{ item.main_unit }})</th>
+                                            <th>Quantity ({{ item.sub_unit }})</th>
+                                            <th>Value</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for stock in item.stocks %}
+                                        <tr>
+                                            <td>{{ stock.warehouse.name }}</td>
+                                            <td>{{ stock.warehouse.location or 'N/A' }}</td>
+                                            <td>{{ stock.quantity }}</td>
+                                            <td>{{ stock.quantity * item.conversion_rate }}</td>
+                                            <td>${{ (stock.quantity * item.purchase_price)|round(2) }}</td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <a href="{{ url_for('view_warehouse', warehouse_id=stock.warehouse.id) }}" class="btn btn-info">
+                                                        <i class="fas fa-warehouse"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-primary" 
+                                                            onclick="adjustStock({{ stock.warehouse.id }}, '{{ stock.warehouse.name }}', {{ stock.quantity }})">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i> No stock information available for this item.
+                                Use the "Add Stock" button to add inventory to warehouses.
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="history-tab">
+                            <!-- Stock movement history will be displayed here -->
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i> Stock movement history will be displayed here.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Stock Modal -->
+<div class="modal fade" id="addStockModal" tabindex="-1" aria-labelledby="addStockModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="addStockModalLabel">
+                    <i class="fas fa-plus-circle me-2"></i> Add Stock for {{ item.name }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addStockForm" method="post" action="{{ url_for('add_stock', item_id=item.id) }}">
+                    <div class="mb-3">
+                        <label for="warehouse_id" class="form-label">Warehouse <span class="text-danger">*</span></label>
+                        <select class="form-select" id="warehouse_id" name="warehouse_id" required>
+                            <option value="">Select Warehouse</option>
+                            {% for warehouse in warehouses %}
+                            <option value="{{ warehouse.id }}">{{ warehouse.name }} ({{ warehouse.location or 'No location' }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">Quantity <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="quantity" name="quantity" step="0.01" min="0" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="unit" class="form-label">Unit <span class="text-danger">*</span></label>
+                        <select class="form-select" id="unit" name="unit" required>
+                            <option value="main_unit">{{ item.main_unit }}</option>
+                            <option value="sub_unit">{{ item.sub_unit }}</option>
+                        </select>
+                        <small class="form-text text-muted">
+                            If you select {{ item.sub_unit }}, the quantity will be converted using the rate: 1 {{ item.main_unit }} = {{ item.conversion_rate }} {{ item.sub_unit }}
+                        </small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="addStockForm" class="btn btn-success">Add Stock</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Adjust Stock Modal -->
+<div class="modal fade" id="adjustStockModal" tabindex="-1" aria-labelledby="adjustStockModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="adjustStockModalLabel">
+                    <i class="fas fa-edit me-2"></i> Adjust Stock
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="adjustStockForm" method="post" action="{{ url_for('adjust_stock', item_id=item.id) }}">
+                    <input type="hidden" id="adjust_warehouse_id" name="warehouse_id">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Warehouse</label>
+                        <input type="text" class="form-control" id="adjust_warehouse_name" readonly>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Current Stock</label>
+                        <input type="text" class="form-control" id="adjust_current_stock" readonly>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="adjustment_type" class="form-label">Adjustment Type <span class="text-danger">*</span></label>
+                        <select class="form-select" id="adjustment_type" name="adjustment_type" required>
+                            <option value="set">Set Exact Quantity</option>
+                            <option value="add">Add to Stock</option>
+                            <option value="remove">Remove from Stock</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="adjust_quantity" class="form-label">Quantity <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="adjust_quantity" name="quantity" step="0.01" min="0" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="adjust_unit" class="form-label">Unit <span class="text-danger">*</span></label>
+                        <select class="form-select" id="adjust_unit" name="unit" required>
+                            <option value="main_unit">{{ item.main_unit }}</option>
+                            <option value="sub_unit">{{ item.sub_unit }}</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="adjust_notes" class="form-label">Reason for Adjustment</label>
+                        <textarea class="form-control" id="adjust_notes" name="notes" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="adjustStockForm" class="btn btn-primary">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function adjustStock(warehouseId, warehouseName, currentStock) {
+        document.getElementById('adjust_warehouse_id').value = warehouseId;
+        document.getElementById('adjust_warehouse_name').value = warehouseName;
+        document.getElementById('adjust_current_stock').value = currentStock + ' {{ item.main_unit }}';
+        document.getElementById('adjust_quantity').value = currentStock;
+        
+        var modal = new bootstrap.Modal(document.getElementById('adjustStockModal'));
+        modal.show();
+    }
+</script>
+{% endblock %}

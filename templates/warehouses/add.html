@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Warehouse - ASSI Warehouse Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('list_warehouses') }}">Warehouses</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Add New</li>
+                </ol>
+            </nav>
+            <h1 class="h3">
+                <i class="fas fa-warehouse me-2"></i> Add New Warehouse
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <i class="fas fa-plus-circle me-2"></i> Warehouse Details
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('add_warehouse') }}">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Warehouse Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="location" name="location">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('list_warehouses') }}" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-times me-2"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i> Save Warehouse
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <i class="fas fa-info-circle me-2"></i> Information
+                </div>
+                <div class="card-body">
+                    <p>
+                        Warehouses are physical locations where your inventory is stored. You can add multiple warehouses to track inventory across different locations.
+                    </p>
+                    <p>
+                        Each warehouse can have its own location and description. Once created, you can add items to these warehouses.
+                    </p>
+                    <div class="alert alert-info">
+                        <i class="fas fa-lightbulb me-2"></i> 
+                        Using descriptive names for warehouses makes it easier to identify them in reports and inventory management.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
