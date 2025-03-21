@@ -1,219 +1,158 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}ASSI Warehouse Management System{% endblock %}</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap RTL CSS for Arabic -->
+    <link id="rtl-stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet" disabled>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f5f5;
-        }
-        .sidebar {
-            background-color: #343a40;
-            min-height: 100vh;
-            color: #fff;
-            position: fixed;
-            width: 250px;
-        }
-        .content {
-            margin-left: 250px;
-            padding: 20px;
-        }
-        .sidebar .nav-link {
-            color: rgba(255, 255, 255, 0.8);
-            transition: 0.3s;
-            padding: 0.75rem 1rem;
-            font-size: 1rem;
-        }
-        .sidebar .nav-link:hover {
-            color: white;
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        .sidebar .nav-link.active {
-            color: white;
-            background-color: #007bff;
-        }
-        .sidebar .nav-link i {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-        }
-        .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-        .card-header {
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #eaeaea;
-            font-weight: bold;
-        }
-        .stat-card {
-            transition: transform 0.3s;
-        }
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-        .dashboard-icon {
-            font-size: 2.5rem;
-            opacity: 0.8;
-        }
-        .login-form {
-            max-width: 400px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        }
-        .login-logo {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .login-title {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #343a40;
-        }
-        /* RTL support for Arabic */
-        html[lang="ar"] {
-            direction: rtl;
-        }
-        html[lang="ar"] .sidebar {
-            right: 0;
-        }
-        html[lang="ar"] .content {
-            margin-right: 250px;
-            margin-left: 0;
-        }
-        html[lang="ar"] .sidebar .nav-link i {
-            margin-right: 0;
-            margin-left: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     {% block styles %}{% endblock %}
 </head>
 <body>
+    {% block navbar %}
     {% if session.user_id %}
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="p-3">
-                <h3 class="text-center">ASSI WMS</h3>
-                <hr>
-                <ul class="nav flex-column">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('dashboard') }}">
+                <i class="fas fa-warehouse me-2"></i>
+                ASSI WMS
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" 
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">
-                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-tachometer-alt me-1"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if 'fund' in request.endpoint %}active{% endif %}" href="{{ url_for('list_funds') }}">
-                            <i class="fas fa-wallet"></i> Funds
+                        <a class="nav-link" href="{{ url_for('list_items') }}">
+                            <i class="fas fa-boxes me-1"></i> Items
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if 'item' in request.endpoint %}active{% endif %}" href="{{ url_for('list_items') }}">
-                            <i class="fas fa-box"></i> Items
+                        <a class="nav-link" href="{{ url_for('list_funds') }}">
+                            <i class="fas fa-money-bill-wave me-1"></i> Funds
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-warehouse"></i> Warehouses
+                    <!-- Add more menu items here -->
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" 
+                           role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-language me-1"></i> Language
                         </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+                            <li>
+                                <a class="dropdown-item language-option" href="#" data-lang="en_US">
+                                    <img src="{{ url_for('static', filename='img/flags/us.png') }}" 
+                                         alt="English" class="flag-icon me-2" width="20">
+                                    English
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item language-option" href="#" data-lang="ar_SA">
+                                    <img src="{{ url_for('static', filename='img/flags/sa.png') }}" 
+                                         alt="Arabic" class="flag-icon me-2" width="20">
+                                    العربية
+                                </a>
+                            </li>
+                        </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-file-invoice-dollar"></i> Invoices
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" 
+                           role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user me-1"></i> {{ session.username }}
                         </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-money-bill-wave"></i> Expenses
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-users"></i> Suppliers & Customers
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-chart-bar"></i> Reports
-                        </a>
-                    </li>
-                    {% if session.is_admin %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-cog"></i> Settings
-                        </a>
-                    </li>
-                    {% endif %}
-                    <li class="nav-item mt-3">
-                        <a class="nav-link" href="{{ url_for('logout') }}">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-user-cog me-2"></i> Profile
+                                </a>
+                            </li>
+                            {% if session.is_admin %}
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-users-cog me-2"></i> Admin Panel
+                                </a>
+                            </li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('logout') }}">
+                                    <i class="fas fa-sign-out-alt me-2"></i> Logout
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
             </div>
         </div>
-        
-        <!-- Main Content -->
-        <div class="content">
-            <nav class="navbar navbar-expand-lg navbar-light bg-light rounded mb-4">
-                <div class="container-fluid">
-                    <span class="navbar-text">
-                        <i class="fas fa-user me-2"></i> {{ session.username }}
-                    </span>
-                    <div class="ms-auto">
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setLanguage('en_US')">English</button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setLanguage('ar_SA')">العربية</button>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-            
-            <!-- Flash Messages -->
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-            
-            <!-- Page Content -->
-            {% block content %}{% endblock %}
-        </div>
-    {% else %}
-        <!-- Login Content -->
-        {% block login_content %}{% endblock %}
+    </nav>
     {% endif %}
-    
+    {% endblock %}
+
+    <div class="container-fluid py-3">
+        {% for category, message in get_flashed_messages(with_categories=true) %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="footer mt-auto py-3 bg-light">
+        <div class="container text-center">
+            <span class="text-muted">
+                &copy; 2025 ASSI Warehouse Management System
+            </span>
+        </div>
+    </footer>
+
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <!-- Language Switcher -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script>
-        function setLanguage(lang) {
-            fetch('/set_language/' + lang, {method: 'POST'})
-                .then(response => {
-                    if (response.ok) {
-                        location.reload();
-                    }
-                });
-        }
+        // Language switcher
+        $('.language-option').on('click', function(e) {
+            e.preventDefault();
+            var lang = $(this).data('lang');
+            
+            // Set RTL for Arabic
+            if (lang === 'ar_SA') {
+                $('html').attr('dir', 'rtl');
+                $('#rtl-stylesheet').removeAttr('disabled');
+            } else {
+                $('html').attr('dir', 'ltr');
+                $('#rtl-stylesheet').attr('disabled', 'disabled');
+            }
+            
+            // Send AJAX request to change language
+            $.ajax({
+                url: "/set_language/" + lang,
+                type: "POST",
+                success: function() {
+                    // Reload page
+                    location.reload();
+                }
+            });
+        });
     </script>
     {% block scripts %}{% endblock %}
 </body>

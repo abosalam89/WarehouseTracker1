@@ -1,0 +1,132 @@
+/* ASSI Warehouse Management System
+   Custom CSS Styles */
+
+/* Global Styles */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container-fluid {
+    flex: 1;
+}
+
+/* Sidebar styles */
+.sidebar {
+    min-height: calc(100vh - 56px);
+    background-color: #f8f9fa;
+    border-right: 1px solid #dee2e6;
+}
+
+/* Card enhancements */
+.card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Table enhancements */
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* Form enhancements */
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Login page */
+.login-page {
+    background-color: #f5f5f5;
+}
+
+/* RTL specific adjustments */
+[dir="rtl"] .ms-auto {
+    margin-right: auto !important;
+    margin-left: 0 !important;
+}
+
+[dir="rtl"] .me-1,
+[dir="rtl"] .me-2,
+[dir="rtl"] .me-3 {
+    margin-left: 0.25rem !important;
+    margin-left: 0.5rem !important;
+    margin-left: 1rem !important;
+    margin-right: 0 !important;
+}
+
+/* Dashboard metrics */
+.metric-card {
+    border-left: 4px solid;
+}
+
+.metric-card.primary {
+    border-color: #007bff;
+}
+
+.metric-card.success {
+    border-color: #28a745;
+}
+
+.metric-card.warning {
+    border-color: #ffc107;
+}
+
+.metric-card.danger {
+    border-color: #dc3545;
+}
+
+/* Status badges */
+.badge-outline-success {
+    color: #28a745;
+    border: 1px solid #28a745;
+    background-color: transparent;
+}
+
+.badge-outline-danger {
+    color: #dc3545;
+    border: 1px solid #dc3545;
+    background-color: transparent;
+}
+
+.badge-outline-warning {
+    color: #ffc107;
+    border: 1px solid #ffc107;
+    background-color: transparent;
+}
+
+/* Invoice styles */
+.invoice-header {
+    border-bottom: 2px solid #dee2e6;
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.invoice-footer {
+    border-top: 2px solid #dee2e6;
+    padding-top: 1.5rem;
+    margin-top: 2rem;
+}
+
+/* Print styles */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+    
+    .container-fluid {
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+}

@@ -1,156 +1,255 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
-{% block title %}Dashboard - ASSI WMS{% endblock %}
+{% block title %}Dashboard - ASSI Warehouse Management System{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <h1 class="h3 mb-4">Dashboard</h1>
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-tachometer-alt me-2"></i>
+            Dashboard
+        </h1>
+    </div>
+</div>
+
+<!-- Overview Cards -->
+<div class="row mb-4">
+    <div class="col-12 col-md-6 col-lg-3 mb-3">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title text-primary">
+                    <i class="fas fa-boxes me-2"></i>
+                    Items
+                </h5>
+                <h2 class="mb-0">{{ total_items }}</h2>
+                <p class="card-text text-muted mt-2">Total items in inventory</p>
+            </div>
+            <div class="card-footer bg-white">
+                <a href="{{ url_for('list_items') }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-arrow-right me-1"></i>
+                    View Items
+                </a>
+            </div>
+        </div>
+    </div>
     
-    <!-- Stats Cards -->
-    <div class="row">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2 stat-card">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Total Items</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_items }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-box fa-2x text-gray-300 dashboard-icon"></i>
-                        </div>
-                    </div>
-                </div>
+    <div class="col-12 col-md-6 col-lg-3 mb-3">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title text-success">
+                    <i class="fas fa-warehouse me-2"></i>
+                    Warehouses
+                </h5>
+                <h2 class="mb-0">{{ total_warehouses }}</h2>
+                <p class="card-text text-muted mt-2">Active storage locations</p>
             </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2 stat-card">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Total Warehouses</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_warehouses }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-warehouse fa-2x text-gray-300 dashboard-icon"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2 stat-card">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                Active Funds</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ funds|length }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-wallet fa-2x text-gray-300 dashboard-icon"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2 stat-card">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Total Balance (USD)</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">${{ "%.2f"|format(total_usd) }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-dollar-sign fa-2x text-gray-300 dashboard-icon"></i>
-                        </div>
-                    </div>
-                </div>
+            <div class="card-footer bg-white">
+                <a href="#" class="btn btn-sm btn-outline-success">
+                    <i class="fas fa-arrow-right me-1"></i>
+                    View Warehouses
+                </a>
             </div>
         </div>
     </div>
-
-    <!-- Funds Overview -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold">Funds Overview</h6>
-                    <a href="{{ url_for('list_funds') }}" class="btn btn-sm btn-primary">View All</a>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Balance</th>
-                                    <th>Currency</th>
-                                    <th>Balance (USD)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for fund in funds %}
-                                <tr>
-                                    <td>{{ fund.name }}</td>
-                                    <td>{{ "%.2f"|format(fund.balance) }}</td>
-                                    <td>{{ fund.currency }}</td>
-                                    <td>{{ "%.2f"|format(fund.balance / fund.exchange_rate) }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+    
+    <div class="col-12 col-md-6 col-lg-3 mb-3">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title text-info">
+                    <i class="fas fa-money-bill-wave me-2"></i>
+                    Funds
+                </h5>
+                <h2 class="mb-0">{{ funds|length }}</h2>
+                <p class="card-text text-muted mt-2">Active financial accounts</p>
+            </div>
+            <div class="card-footer bg-white">
+                <a href="{{ url_for('list_funds') }}" class="btn btn-sm btn-outline-info">
+                    <i class="fas fa-arrow-right me-1"></i>
+                    View Funds
+                </a>
             </div>
         </div>
     </div>
+    
+    <div class="col-12 col-md-6 col-lg-3 mb-3">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title text-danger">
+                    <i class="fas fa-dollar-sign me-2"></i>
+                    Total Balance (USD)
+                </h5>
+                <h2 class="mb-0">${{ '%0.2f'|format(total_usd|default(0)) }}</h2>
+                <p class="card-text text-muted mt-2">Across all funds</p>
+            </div>
+            <div class="card-footer bg-white">
+                <a href="#" class="btn btn-sm btn-outline-danger">
+                    <i class="fas fa-arrow-right me-1"></i>
+                    Financial Report
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 
+<div class="row">
+    <!-- Fund Balances -->
+    <div class="col-12 col-lg-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="fas fa-money-bill-wave me-2"></i>
+                    Fund Balances
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Fund</th>
+                                <th>Balance</th>
+                                <th>Currency</th>
+                                <th>Exchange Rate</th>
+                                <th>USD Equivalent</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fund in funds %}
+                            <tr>
+                                <td>
+                                    <a href="{{ url_for('view_fund', fund_id=fund.id) }}">
+                                        {{ fund.name }}
+                                    </a>
+                                </td>
+                                <td>{{ '%0.2f'|format(fund.balance) }}</td>
+                                <td>{{ fund.currency }}</td>
+                                <td>{{ '%0.2f'|format(fund.exchange_rate) }}</td>
+                                <td>
+                                    {% if fund.currency == 'USD' %}
+                                    ${{ '%0.2f'|format(fund.balance) }}
+                                    {% else %}
+                                    ${{ '%0.2f'|format(fund.balance / fund.exchange_rate) }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">
+                                    No funds available
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-white">
+                <a href="{{ url_for('add_fund') }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-plus me-1"></i>
+                    Add New Fund
+                </a>
+            </div>
+        </div>
+    </div>
+    
     <!-- Recent Transactions -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold">Recent Transactions</h6>
+    <div class="col-12 col-lg-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="fas fa-exchange-alt me-2"></i>
+                    Recent Transactions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Fund</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in recent_transactions %}
+                            <tr>
+                                <td>{{ transaction.date.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>{{ transaction.fund }}</td>
+                                <td>
+                                    {% if transaction.type == 'deposit' %}
+                                    <span class="badge bg-success">Deposit</span>
+                                    {% elif transaction.type == 'withdrawal' %}
+                                    <span class="badge bg-danger">Withdrawal</span>
+                                    {% elif transaction.type == 'transfer' %}
+                                    <span class="badge bg-info">Transfer</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{ transaction.type }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ transaction.amount }} {{ transaction.currency }}
+                                </td>
+                                <td>{{ transaction.description }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">
+                                    No transactions available
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Fund</th>
-                                    <th>Amount</th>
-                                    <th>Type</th>
-                                    <th>Date</th>
-                                    <th>Description</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for transaction in recent_transactions %}
-                                <tr>
-                                    <td>{{ transaction.fund }}</td>
-                                    <td class="{{ 'text-success' if transaction.type == 'deposit' else 'text-danger' }}">
-                                        {{ transaction.amount }} {{ transaction.currency }}
-                                    </td>
-                                    <td>{{ transaction.type }}</td>
-                                    <td>{{ transaction.date.strftime('%Y-%m-%d %H:%M') }}</td>
-                                    <td>{{ transaction.description }}</td>
-                                </tr>
-                                {% endfor %}
-                                {% if recent_transactions|length == 0 %}
-                                <tr>
-                                    <td colspan="5" class="text-center">No recent transactions</td>
-                                </tr>
-                                {% endif %}
-                            </tbody>
-                        </table>
+            </div>
+            <div class="card-footer bg-white">
+                <a href="#" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-list me-1"></i>
+                    View All Transactions
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="fas fa-bolt me-2"></i>
+                    Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-6 col-md-3">
+                        <a href="{{ url_for('add_item') }}" class="btn btn-outline-primary d-block py-3">
+                            <i class="fas fa-box fa-2x mb-2 d-block mx-auto"></i>
+                            Add New Item
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{{ url_for('add_fund') }}" class="btn btn-outline-success d-block py-3">
+                            <i class="fas fa-money-bill fa-2x mb-2 d-block mx-auto"></i>
+                            Add New Fund
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="#" class="btn btn-outline-info d-block py-3">
+                            <i class="fas fa-file-invoice-dollar fa-2x mb-2 d-block mx-auto"></i>
+                            Create Invoice
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="#" class="btn btn-outline-secondary d-block py-3">
+                            <i class="fas fa-chart-line fa-2x mb-2 d-block mx-auto"></i>
+                            View Reports
+                        </a>
                     </div>
                 </div>
             </div>

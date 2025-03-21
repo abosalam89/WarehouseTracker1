@@ -1,45 +1,84 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
-{% block title %}Login - ASSI WMS{% endblock %}
+{% block title %}Login - ASSI Warehouse Management System{% endblock %}
 
-{% block login_content %}
-<div class="container">
-    <div class="login-form">
-        <div class="login-logo">
-            <i class="fas fa-warehouse text-primary" style="font-size: 3rem;"></i>
-        </div>
-        <h2 class="login-title">ASSI Warehouse Management System</h2>
-        
-        {% if error %}
-        <div class="alert alert-danger" role="alert">
-            {{ error }}
-        </div>
-        {% endif %}
-        
-        <form method="post" action="{{ url_for('login') }}">
-            <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-user"></i></span>
-                    <input type="text" class="form-control" id="username" name="username" required autofocus>
+{% block navbar %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center min-vh-100 align-items-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white text-center py-3">
+                <h4 class="mb-0">
+                    <i class="fas fa-warehouse me-2"></i>
+                    ASSI WMS
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <h5 class="card-title text-center mb-4">
+                    <i class="fas fa-sign-in-alt me-2"></i>
+                    Login
+                </h5>
+                
+                {% if error %}
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    {{ error }}
+                </div>
+                {% endif %}
+                
+                <form method="post" action="{{ url_for('login') }}">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">
+                            <i class="fas fa-user me-2"></i>
+                            Username
+                        </label>
+                        <input type="text" class="form-control" id="username" name="username" required autofocus>
+                    </div>
+                    <div class="mb-4">
+                        <label for="password" class="form-label">
+                            <i class="fas fa-lock me-2"></i>
+                            Password
+                        </label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>
+                            Login
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="mt-4 text-center">
+                    <div class="dropdown d-inline-block">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
+                                id="languageMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-language me-1"></i>
+                            Language
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageMenuButton">
+                            <li>
+                                <a class="dropdown-item language-option" href="#" data-lang="en_US">
+                                    <img src="{{ url_for('static', filename='img/flags/us.png') }}" 
+                                         alt="English" class="flag-icon me-2" width="20">
+                                    English
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item language-option" href="#" data-lang="ar_SA">
+                                    <img src="{{ url_for('static', filename='img/flags/sa.png') }}" 
+                                         alt="Arabic" class="flag-icon me-2" width="20">
+                                    العربية
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                    <input type="password" class="form-control" id="password" name="password" required>
-                </div>
+            <div class="card-footer text-center text-muted py-3">
+                Default login: admin / admin
             </div>
-            <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                <label class="form-check-label" for="remember">Remember me</label>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Login</button>
-        </form>
-        
-        <div class="text-center mt-3">
-            <small class="text-muted">Default admin: username = 'admin', password = 'admin'</small>
         </div>
     </div>
 </div>
