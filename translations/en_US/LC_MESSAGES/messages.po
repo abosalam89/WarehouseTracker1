@@ -1,0 +1,929 @@
+# English (United States) translations for ASSI Warehouse Management System.
+# Copyright (C) 2023 ASSI
+# This file is distributed under the same license as the ASSI-WMS project.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ASSI-WMS 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-05-30 10:00+0300\n"
+"PO-Revision-Date: 2023-05-30 10:00+0300\n"
+"Last-Translator: \n"
+"Language-Team: en_US <>\n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+# General
+msgid "Back to Main Menu"
+msgstr "Back to Main Menu"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Save"
+msgstr "Save"
+
+msgid "Export"
+msgstr "Export"
+
+msgid "Export to Excel"
+msgstr "Export to Excel"
+
+msgid "Export Complete"
+msgstr "Export Complete"
+
+msgid "Report exported to {0}"
+msgstr "Report exported to {0}"
+
+msgid "ID"
+msgstr "ID"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Active"
+msgstr "Active"
+
+msgid "Inactive"
+msgstr "Inactive"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Date"
+msgstr "Date"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Notes"
+msgstr "Notes"
+
+msgid "Currency"
+msgstr "Currency"
+
+msgid "Exchange Rate"
+msgstr "Exchange Rate"
+
+msgid "(to USD)"
+msgstr "(to USD)"
+
+msgid "Success"
+msgstr "Success"
+
+msgid "Error"
+msgstr "Error"
+
+msgid "Warning"
+msgstr "Warning"
+
+msgid "Information"
+msgstr "Information"
+
+msgid "Please enter valid values"
+msgstr "Please enter valid values"
+
+msgid "Error loading metrics: {0}"
+msgstr "Error loading metrics: {0}"
+
+msgid "Error loading chart: {0}"
+msgstr "Error loading chart: {0}"
+
+msgid "No data available"
+msgstr "No data available"
+
+# Login
+msgid "Username:"
+msgstr "Username:"
+
+msgid "Password:"
+msgstr "Password:"
+
+msgid "Login"
+msgstr "Login"
+
+msgid "Username is required"
+msgstr "Username is required"
+
+msgid "Password is required"
+msgstr "Password is required"
+
+msgid "Invalid username or password"
+msgstr "Invalid username or password"
+
+# Funds Management
+msgid "Funds Management"
+msgstr "Funds Management"
+
+msgid "Add New Fund"
+msgstr "Add New Fund"
+
+msgid "Fund Name:"
+msgstr "Fund Name:"
+
+msgid "Fund Name"
+msgstr "Fund Name"
+
+msgid "Currency:"
+msgstr "Currency:"
+
+msgid "Exchange Rate:"
+msgstr "Exchange Rate:"
+
+msgid "Initial Balance:"
+msgstr "Initial Balance:"
+
+msgid "Balance:"
+msgstr "Balance:"
+
+msgid "Current Balance:"
+msgstr "Current Balance:"
+
+msgid "Add Fund"
+msgstr "Add Fund"
+
+msgid "Fund name is required"
+msgstr "Fund name is required"
+
+msgid "Exchange rate must be greater than zero"
+msgstr "Exchange rate must be greater than zero"
+
+msgid "Fund added successfully"
+msgstr "Fund added successfully"
+
+msgid "Edit Fund"
+msgstr "Edit Fund"
+
+msgid "Fund updated successfully"
+msgstr "Fund updated successfully"
+
+msgid "Deactivate Fund"
+msgstr "Deactivate Fund"
+
+msgid "Confirm Deactivation"
+msgstr "Confirm Deactivation"
+
+msgid "Are you sure you want to deactivate this fund?"
+msgstr "Are you sure you want to deactivate this fund?"
+
+msgid "Fund deactivated successfully"
+msgstr "Fund deactivated successfully"
+
+msgid "Funds"
+msgstr "Funds"
+
+msgid "Funds List"
+msgstr "Funds List"
+
+msgid "View Transactions"
+msgstr "View Transactions"
+
+msgid "Transaction Type"
+msgstr "Transaction Type"
+
+msgid "From Fund:"
+msgstr "From Fund:"
+
+msgid "To Fund:"
+msgstr "To Fund:"
+
+msgid "Amount:"
+msgstr "Amount:"
+
+msgid "Transfer"
+msgstr "Transfer"
+
+msgid "Transfer Complete"
+msgstr "Transfer Complete"
+
+msgid "Funds transferred successfully"
+msgstr "Funds transferred successfully"
+
+msgid "Transfer Stock"
+msgstr "Transfer Stock"
+
+msgid "Stock transferred successfully"
+msgstr "Stock transferred successfully"
+
+msgid "{0} {1} transferred successfully"
+msgstr "{0} {1} transferred successfully"
+
+# Items Management
+msgid "Items Management"
+msgstr "Items Management"
+
+msgid "Add New Item"
+msgstr "Add New Item"
+
+msgid "Item Name:"
+msgstr "Item Name:"
+
+msgid "Item Name"
+msgstr "Item Name"
+
+msgid "Main Unit:"
+msgstr "Main Unit:"
+
+msgid "Main Unit"
+msgstr "Main Unit"
+
+msgid "Sub Unit:"
+msgstr "Sub Unit:"
+
+msgid "Sub Unit"
+msgstr "Sub Unit"
+
+msgid "Conversion Rate:"
+msgstr "Conversion Rate:"
+
+msgid "Conversion"
+msgstr "Conversion"
+
+msgid "(e.g., 1 bag = 50 kg)"
+msgstr "(e.g., 1 bag = 50 kg)"
+
+msgid "Purchase Price:"
+msgstr "Purchase Price:"
+
+msgid "Purchase Price"
+msgstr "Purchase Price"
+
+msgid "Selling Price:"
+msgstr "Selling Price:"
+
+msgid "Selling Price"
+msgstr "Selling Price"
+
+msgid "Add Item"
+msgstr "Add Item"
+
+msgid "Item name is required"
+msgstr "Item name is required"
+
+msgid "Main unit is required"
+msgstr "Main unit is required"
+
+msgid "Sub unit is required"
+msgstr "Sub unit is required"
+
+msgid "Conversion rate must be greater than zero"
+msgstr "Conversion rate must be greater than zero"
+
+msgid "Purchase price cannot be negative"
+msgstr "Purchase price cannot be negative"
+
+msgid "Selling price cannot be negative"
+msgstr "Selling price cannot be negative"
+
+msgid "Item added successfully"
+msgstr "Item added successfully"
+
+msgid "Edit Item"
+msgstr "Edit Item"
+
+msgid "Item updated successfully"
+msgstr "Item updated successfully"
+
+msgid "Deactivate Item"
+msgstr "Deactivate Item"
+
+msgid "Are you sure you want to deactivate this item?"
+msgstr "Are you sure you want to deactivate this item?"
+
+msgid "Item deactivated successfully"
+msgstr "Item deactivated successfully"
+
+msgid "Items"
+msgstr "Items"
+
+msgid "Items List"
+msgstr "Items List"
+
+msgid "View Stock Details"
+msgstr "View Stock Details"
+
+msgid "Stock Details for {0}"
+msgstr "Stock Details for {0}"
+
+msgid "Total Stock: {0} {1} ({2:.1f} {3})"
+msgstr "Total Stock: {0} {1} ({2:.1f} {3})"
+
+msgid "Main Unit: {0}, Sub Unit: {1}, Conversion: 1 {0} = {2} {1}"
+msgstr "Main Unit: {0}, Sub Unit: {1}, Conversion: 1 {0} = {2} {1}"
+
+msgid "Quantity ({0})"
+msgstr "Quantity ({0})"
+
+msgid "Last Updated"
+msgstr "Last Updated"
+
+msgid "Stock Management"
+msgstr "Stock Management"
+
+msgid "Item Details"
+msgstr "Item Details"
+
+msgid "Warehouse:"
+msgstr "Warehouse:"
+
+msgid "Stock Adjustment"
+msgstr "Stock Adjustment"
+
+msgid "Adjustment Type:"
+msgstr "Adjustment Type:"
+
+msgid "Add Stock"
+msgstr "Add Stock"
+
+msgid "Remove Stock"
+msgstr "Remove Stock"
+
+msgid "Quantity:"
+msgstr "Quantity:"
+
+msgid "Apply Adjustment"
+msgstr "Apply Adjustment"
+
+msgid "Quantity must be greater than zero"
+msgstr "Quantity must be greater than zero"
+
+msgid "Stock updated successfully"
+msgstr "Stock updated successfully"
+
+msgid "Stock Added"
+msgstr "Stock Added"
+
+msgid "{0} {1} added to {2}"
+msgstr "{0} {1} added to {2}"
+
+msgid "Stock Removed"
+msgstr "Stock Removed"
+
+msgid "{0} {1} removed from {2}"
+msgstr "{0} {1} removed from {2}"
+
+msgid "Insufficient stock"
+msgstr "Insufficient stock"
+
+msgid "Insufficient stock in source warehouse"
+msgstr "Insufficient stock in source warehouse"
+
+msgid "Insufficient stock. Available: {0} {1}"
+msgstr "Insufficient stock. Available: {0} {1}"
+
+# Warehouse Management
+msgid "Warehouses Management"
+msgstr "Warehouses Management"
+
+msgid "Add New Warehouse"
+msgstr "Add New Warehouse"
+
+msgid "Warehouse Name:"
+msgstr "Warehouse Name:"
+
+msgid "Warehouse Name"
+msgstr "Warehouse Name"
+
+msgid "Location:"
+msgstr "Location:"
+
+msgid "Location"
+msgstr "Location"
+
+msgid "Add Warehouse"
+msgstr "Add Warehouse"
+
+msgid "Warehouse name is required"
+msgstr "Warehouse name is required"
+
+msgid "Warehouse added successfully"
+msgstr "Warehouse added successfully"
+
+msgid "Edit Warehouse"
+msgstr "Edit Warehouse"
+
+msgid "Warehouse updated successfully"
+msgstr "Warehouse updated successfully"
+
+msgid "Deactivate Warehouse"
+msgstr "Deactivate Warehouse"
+
+msgid "Are you sure you want to deactivate this warehouse?"
+msgstr "Are you sure you want to deactivate this warehouse?"
+
+msgid "Warehouse deactivated successfully"
+msgstr "Warehouse deactivated successfully"
+
+msgid "Warehouses"
+msgstr "Warehouses"
+
+msgid "Warehouses List"
+msgstr "Warehouses List"
+
+msgid "View Inventory"
+msgstr "View Inventory"
+
+msgid "Item Count"
+msgstr "Item Count"
+
+msgid "Inventory Value"
+msgstr "Inventory Value"
+
+msgid "Inventory for {0}"
+msgstr "Inventory for {0}"
+
+msgid "Inventory"
+msgstr "Inventory"
+
+msgid "Inventory Details"
+msgstr "Inventory Details"
+
+# Invoices
+msgid "Invoices Management"
+msgstr "Invoices Management"
+
+msgid "New Purchase Invoice"
+msgstr "New Purchase Invoice"
+
+msgid "New Sales Invoice"
+msgstr "New Sales Invoice"
+
+msgid "Invoice Settings"
+msgstr "Invoice Settings"
+
+msgid "Due Date:"
+msgstr "Due Date:"
+
+msgid "(Optional)"
+msgstr "(Optional)"
+
+msgid "Additional Costs:"
+msgstr "Additional Costs:"
+
+msgid "Tax:"
+msgstr "Tax:"
+
+msgid "Invoice Items"
+msgstr "Invoice Items"
+
+msgid "Item:"
+msgstr "Item:"
+
+msgid "Price per Unit:"
+msgstr "Price per Unit:"
+
+msgid "Use Purchase Price"
+msgstr "Use Purchase Price"
+
+msgid "Use Selling Price"
+msgstr "Use Selling Price"
+
+msgid "Create Purchase Invoice"
+msgstr "Create Purchase Invoice"
+
+msgid "Create Sales Invoice"
+msgstr "Create Sales Invoice"
+
+msgid "Please add at least one item to the invoice"
+msgstr "Please add at least one item to the invoice"
+
+msgid "Invalid invoice date format"
+msgstr "Invalid invoice date format"
+
+msgid "Invalid due date format"
+msgstr "Invalid due date format"
+
+msgid "Purchase invoice created successfully"
+msgstr "Purchase invoice created successfully"
+
+msgid "Sales invoice created successfully"
+msgstr "Sales invoice created successfully"
+
+msgid "Supplier"
+msgstr "Supplier"
+
+msgid "Customer"
+msgstr "Customer"
+
+msgid "Supplier & Customer"
+msgstr "Supplier & Customer"
+
+msgid "Invoice Details - {0}"
+msgstr "Invoice Details - {0}"
+
+msgid "Purchase Invoice"
+msgstr "Purchase Invoice"
+
+msgid "Sales Invoice"
+msgstr "Sales Invoice"
+
+msgid "Pending"
+msgstr "Pending"
+
+msgid "Partially Paid"
+msgstr "Partially Paid"
+
+msgid "Paid"
+msgstr "Paid"
+
+msgid "Cancelled"
+msgstr "Cancelled"
+
+msgid "Items"
+msgstr "Items"
+
+msgid "Payments"
+msgstr "Payments"
+
+msgid "Invoice:"
+msgstr "Invoice:"
+
+msgid "Total:"
+msgstr "Total:"
+
+msgid "Subtotal:"
+msgstr "Subtotal:"
+
+msgid "Total Amount:"
+msgstr "Total Amount:"
+
+msgid "Paid:"
+msgstr "Paid:"
+
+msgid "Remaining:"
+msgstr "Remaining:"
+
+msgid "Record Payment"
+msgstr "Record Payment"
+
+msgid "Cancel Invoice"
+msgstr "Cancel Invoice"
+
+msgid "Invoice Number"
+msgstr "Invoice Number"
+
+msgid "Entity"
+msgstr "Entity"
+
+msgid "Payment Method:"
+msgstr "Payment Method:"
+
+msgid "Fund:"
+msgstr "Fund:"
+
+msgid "Amount must be greater than zero"
+msgstr "Amount must be greater than zero"
+
+msgid "Invalid date format"
+msgstr "Invalid date format"
+
+msgid "Payment recorded successfully"
+msgstr "Payment recorded successfully"
+
+msgid "Make Payment"
+msgstr "Make Payment"
+
+msgid "Receive Payment"
+msgstr "Receive Payment"
+
+msgid "Are you sure you want to cancel this invoice? This will reverse all stock changes."
+msgstr "Are you sure you want to cancel this invoice? This will reverse all stock changes."
+
+msgid "Invoice cancelled successfully"
+msgstr "Invoice cancelled successfully"
+
+msgid "This invoice cannot receive payments"
+msgstr "This invoice cannot receive payments"
+
+# Expenses
+msgid "Expense Management"
+msgstr "Expense Management"
+
+msgid "Add New Expense"
+msgstr "Add New Expense"
+
+msgid "Category:"
+msgstr "Category:"
+
+msgid "Add Expense"
+msgstr "Add Expense"
+
+msgid "Expense added successfully"
+msgstr "Expense added successfully"
+
+msgid "Add New Category"
+msgstr "Add New Category"
+
+msgid "Category Name:"
+msgstr "Category Name:"
+
+msgid "Category name is required"
+msgstr "Category name is required"
+
+msgid "Add Category"
+msgstr "Add Category"
+
+msgid "Category added successfully"
+msgstr "Category added successfully"
+
+msgid "Edit Category"
+msgstr "Edit Category"
+
+msgid "Category updated successfully"
+msgstr "Category updated successfully"
+
+msgid "Expenses"
+msgstr "Expenses"
+
+msgid "Expenses List"
+msgstr "Expenses List"
+
+msgid "Categories"
+msgstr "Categories"
+
+msgid "Category Name"
+msgstr "Category Name"
+
+msgid "Total Expenses: {0:.2f} USD"
+msgstr "Total Expenses: {0:.2f} USD"
+
+# Suppliers & Customers
+msgid "Suppliers & Customers"
+msgstr "Suppliers & Customers"
+
+msgid "Add New Supplier or Customer"
+msgstr "Add New Supplier or Customer"
+
+msgid "Phone:"
+msgstr "Phone:"
+
+msgid "Phone"
+msgstr "Phone"
+
+msgid "Email:"
+msgstr "Email:"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Address:"
+msgstr "Address:"
+
+msgid "Address"
+msgstr "Address"
+
+msgid "Add Entity"
+msgstr "Add Entity"
+
+msgid "Entity added successfully"
+msgstr "Entity added successfully"
+
+msgid "Edit {0}"
+msgstr "Edit {0}"
+
+msgid "Entity updated successfully"
+msgstr "Entity updated successfully"
+
+msgid "Supplier"
+msgstr "Supplier"
+
+msgid "Customer"
+msgstr "Customer"
+
+msgid "Both"
+msgstr "Both"
+
+msgid "Suppliers"
+msgstr "Suppliers"
+
+msgid "Customers"
+msgstr "Customers"
+
+msgid "Entity Information"
+msgstr "Entity Information"
+
+msgid "Payment History - {0}"
+msgstr "Payment History - {0}"
+
+msgid "Type: {0} | Balance: {1} {2}"
+msgstr "Type: {0} | Balance: {1} {2}"
+
+msgid "Invoice"
+msgstr "Invoice"
+
+msgid "Payment Details"
+msgstr "Payment Details"
+
+msgid "Payment Date:"
+msgstr "Payment Date:"
+
+msgid "{0} Payment"
+msgstr "{0} Payment"
+
+msgid "{0} Payment - {1}"
+msgstr "{0} Payment - {1}"
+
+msgid "Make"
+msgstr "Make"
+
+msgid "Receive"
+msgstr "Receive"
+
+msgid "Direct Payment"
+msgstr "Direct Payment"
+
+# Reports
+msgid "Reports"
+msgstr "Reports"
+
+msgid "Reports Dashboard"
+msgstr "Reports Dashboard"
+
+msgid "Quick Access"
+msgstr "Quick Access"
+
+msgid "Key Metrics"
+msgstr "Key Metrics"
+
+msgid "Monthly Sales"
+msgstr "Monthly Sales"
+
+msgid "Receivables"
+msgstr "Receivables"
+
+msgid "Monthly Expenses"
+msgstr "Monthly Expenses"
+
+msgid "Payables"
+msgstr "Payables"
+
+msgid "Monthly Profit"
+msgstr "Monthly Profit"
+
+msgid "Total: {0:.2f}"
+msgstr "Total: {0:.2f}"
+
+msgid "Items: {0}"
+msgstr "Items: {0}"
+
+msgid "Sales Trend (Last 30 Days)"
+msgstr "Sales Trend (Last 30 Days)"
+
+msgid "No Sales Data Available"
+msgstr "No Sales Data Available"
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "Report Filters"
+msgstr "Report Filters"
+
+msgid "Date Range:"
+msgstr "Date Range:"
+
+msgid "Last 30 Days"
+msgstr "Last 30 Days"
+
+msgid "This Month"
+msgstr "This Month"
+
+msgid "Last Month"
+msgstr "Last Month"
+
+msgid "This Quarter"
+msgstr "This Quarter"
+
+msgid "This Year"
+msgstr "This Year"
+
+msgid "Custom"
+msgstr "Custom"
+
+msgid "From:"
+msgstr "From:"
+
+msgid "To:"
+msgstr "To:"
+
+msgid "All Customers"
+msgstr "All Customers"
+
+msgid "Generate Report"
+msgstr "Generate Report"
+
+msgid "Please enter valid dates"
+msgstr "Please enter valid dates"
+
+msgid "Report Generated"
+msgstr "Report Generated"
+
+msgid "Sales report generated successfully"
+msgstr "Sales report generated successfully"
+
+msgid "Error generating report: {0}"
+msgstr "Error generating report: {0}"
+
+msgid "No chart data available"
+msgstr "No chart data available"
+
+msgid "Error displaying chart: {0}"
+msgstr "Error displaying chart: {0}"
+
+msgid "Summary"
+msgstr "Summary"
+
+msgid "Sales Chart"
+msgstr "Sales Chart"
+
+msgid "Details"
+msgstr "Details"
+
+msgid "All Warehouses"
+msgstr "All Warehouses"
+
+msgid "Inventory report generated successfully"
+msgstr "Inventory report generated successfully"
+
+msgid "No fund data available"
+msgstr "No fund data available"
+
+msgid "No expense data available"
+msgstr "No expense data available"
+
+msgid "Financial report generated successfully"
+msgstr "Financial report generated successfully"
+
+msgid "Financial Analysis"
+msgstr "Financial Analysis"
+
+msgid "Total Sales:"
+msgstr "Total Sales:"
+
+msgid "Total Expenses:"
+msgstr "Total Expenses:"
+
+msgid "Total Purchases:"
+msgstr "Total Purchases:"
+
+msgid "Profit:"
+msgstr "Profit:"
+
+msgid "Report Date:"
+msgstr "Report Date:"
+
+msgid "Minimum Balance:"
+msgstr "Minimum Balance:"
+
+msgid "Total Receivables:"
+msgstr "Total Receivables:"
+
+msgid "Total Payables:"
+msgstr "Total Payables:"
+
+msgid "Net Position:"
+msgstr "Net Position:"
+
+msgid "Customers with Debt:"
+msgstr "Customers with Debt:"
+
+msgid "Suppliers to Pay:"
+msgstr "Suppliers to Pay:"
+
+msgid "Receivables & Payables report generated successfully"
+msgstr "Receivables & Payables report generated successfully"
+
+msgid "No receivables data available"
+msgstr "No receivables data available"
+
+msgid "No payables data available"
+msgstr "No payables data available"
+
+msgid "No report data available to export"
+msgstr "No report data available to export"
+
+msgid "Receivables & Payables"
+msgstr "Receivables & Payables"
+
+msgid "Receivables (Customers)"
+msgstr "Receivables (Customers)"
+
+msgid "Payables (Suppliers)"
+msgstr "Payables (Suppliers)"
+
+msgid "Sales Report"
+msgstr "Sales Report"
+
+msgid "Inventory Report"
+msgstr "Inventory Report"
+
+msgid "Financial Report"
+msgstr "Financial Report"
+
+msgid "USD Equivalent"
+msgstr "USD Equivalent"

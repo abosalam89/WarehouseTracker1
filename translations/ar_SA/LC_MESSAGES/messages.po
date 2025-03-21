@@ -1,0 +1,929 @@
+# Arabic (Saudi Arabia) translations for ASSI Warehouse Management System.
+# Copyright (C) 2023 ASSI
+# This file is distributed under the same license as the ASSI-WMS project.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ASSI-WMS 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-05-30 10:00+0300\n"
+"PO-Revision-Date: 2023-05-30 10:00+0300\n"
+"Last-Translator: \n"
+"Language-Team: ar_SA <>\n"
+"Language: ar_SA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
+
+# General
+msgid "Back to Main Menu"
+msgstr "العودة إلى القائمة الرئيسية"
+
+msgid "Cancel"
+msgstr "إلغاء"
+
+msgid "Save"
+msgstr "حفظ"
+
+msgid "Export"
+msgstr "تصدير"
+
+msgid "Export to Excel"
+msgstr "تصدير إلى إكسل"
+
+msgid "Export Complete"
+msgstr "اكتمل التصدير"
+
+msgid "Report exported to {0}"
+msgstr "تم تصدير التقرير إلى {0}"
+
+msgid "ID"
+msgstr "المعرف"
+
+msgid "Name"
+msgstr "الاسم"
+
+msgid "Type"
+msgstr "النوع"
+
+msgid "Active"
+msgstr "نشط"
+
+msgid "Inactive"
+msgstr "غير نشط"
+
+msgid "Status"
+msgstr "الحالة"
+
+msgid "Date"
+msgstr "التاريخ"
+
+msgid "Description"
+msgstr "الوصف"
+
+msgid "Notes"
+msgstr "ملاحظات"
+
+msgid "Currency"
+msgstr "العملة"
+
+msgid "Exchange Rate"
+msgstr "سعر الصرف"
+
+msgid "(to USD)"
+msgstr "(إلى الدولار)"
+
+msgid "Success"
+msgstr "نجاح"
+
+msgid "Error"
+msgstr "خطأ"
+
+msgid "Warning"
+msgstr "تحذير"
+
+msgid "Information"
+msgstr "معلومات"
+
+msgid "Please enter valid values"
+msgstr "يرجى إدخال قيم صالحة"
+
+msgid "Error loading metrics: {0}"
+msgstr "خطأ في تحميل المقاييس: {0}"
+
+msgid "Error loading chart: {0}"
+msgstr "خطأ في تحميل الرسم البياني: {0}"
+
+msgid "No data available"
+msgstr "لا توجد بيانات متاحة"
+
+# Login
+msgid "Username:"
+msgstr "اسم المستخدم:"
+
+msgid "Password:"
+msgstr "كلمة المرور:"
+
+msgid "Login"
+msgstr "تسجيل الدخول"
+
+msgid "Username is required"
+msgstr "اسم المستخدم مطلوب"
+
+msgid "Password is required"
+msgstr "كلمة المرور مطلوبة"
+
+msgid "Invalid username or password"
+msgstr "اسم المستخدم أو كلمة المرور غير صحيحة"
+
+# Funds Management
+msgid "Funds Management"
+msgstr "إدارة الصناديق"
+
+msgid "Add New Fund"
+msgstr "إضافة صندوق جديد"
+
+msgid "Fund Name:"
+msgstr "اسم الصندوق:"
+
+msgid "Fund Name"
+msgstr "اسم الصندوق"
+
+msgid "Currency:"
+msgstr "العملة:"
+
+msgid "Exchange Rate:"
+msgstr "سعر الصرف:"
+
+msgid "Initial Balance:"
+msgstr "الرصيد الأولي:"
+
+msgid "Balance:"
+msgstr "الرصيد:"
+
+msgid "Current Balance:"
+msgstr "الرصيد الحالي:"
+
+msgid "Add Fund"
+msgstr "إضافة صندوق"
+
+msgid "Fund name is required"
+msgstr "اسم الصندوق مطلوب"
+
+msgid "Exchange rate must be greater than zero"
+msgstr "يجب أن يكون سعر الصرف أكبر من صفر"
+
+msgid "Fund added successfully"
+msgstr "تمت إضافة الصندوق بنجاح"
+
+msgid "Edit Fund"
+msgstr "تعديل الصندوق"
+
+msgid "Fund updated successfully"
+msgstr "تم تحديث الصندوق بنجاح"
+
+msgid "Deactivate Fund"
+msgstr "تعطيل الصندوق"
+
+msgid "Confirm Deactivation"
+msgstr "تأكيد التعطيل"
+
+msgid "Are you sure you want to deactivate this fund?"
+msgstr "هل أنت متأكد أنك تريد تعطيل هذا الصندوق؟"
+
+msgid "Fund deactivated successfully"
+msgstr "تم تعطيل الصندوق بنجاح"
+
+msgid "Funds"
+msgstr "الصناديق"
+
+msgid "Funds List"
+msgstr "قائمة الصناديق"
+
+msgid "View Transactions"
+msgstr "عرض المعاملات"
+
+msgid "Transaction Type"
+msgstr "نوع المعاملة"
+
+msgid "From Fund:"
+msgstr "من صندوق:"
+
+msgid "To Fund:"
+msgstr "إلى صندوق:"
+
+msgid "Amount:"
+msgstr "المبلغ:"
+
+msgid "Transfer"
+msgstr "تحويل"
+
+msgid "Transfer Complete"
+msgstr "اكتمال التحويل"
+
+msgid "Funds transferred successfully"
+msgstr "تم تحويل الأموال بنجاح"
+
+msgid "Transfer Stock"
+msgstr "تحويل المخزون"
+
+msgid "Stock transferred successfully"
+msgstr "تم تحويل المخزون بنجاح"
+
+msgid "{0} {1} transferred successfully"
+msgstr "تم تحويل {0} {1} بنجاح"
+
+# Items Management
+msgid "Items Management"
+msgstr "إدارة العناصر"
+
+msgid "Add New Item"
+msgstr "إضافة عنصر جديد"
+
+msgid "Item Name:"
+msgstr "اسم العنصر:"
+
+msgid "Item Name"
+msgstr "اسم العنصر"
+
+msgid "Main Unit:"
+msgstr "الوحدة الرئيسية:"
+
+msgid "Main Unit"
+msgstr "الوحدة الرئيسية"
+
+msgid "Sub Unit:"
+msgstr "الوحدة الفرعية:"
+
+msgid "Sub Unit"
+msgstr "الوحدة الفرعية"
+
+msgid "Conversion Rate:"
+msgstr "معدل التحويل:"
+
+msgid "Conversion"
+msgstr "التحويل"
+
+msgid "(e.g., 1 bag = 50 kg)"
+msgstr "(مثال: 1 شوال = 50 كيلوغرام)"
+
+msgid "Purchase Price:"
+msgstr "سعر الشراء:"
+
+msgid "Purchase Price"
+msgstr "سعر الشراء"
+
+msgid "Selling Price:"
+msgstr "سعر البيع:"
+
+msgid "Selling Price"
+msgstr "سعر البيع"
+
+msgid "Add Item"
+msgstr "إضافة عنصر"
+
+msgid "Item name is required"
+msgstr "اسم العنصر مطلوب"
+
+msgid "Main unit is required"
+msgstr "الوحدة الرئيسية مطلوبة"
+
+msgid "Sub unit is required"
+msgstr "الوحدة الفرعية مطلوبة"
+
+msgid "Conversion rate must be greater than zero"
+msgstr "يجب أن يكون معدل التحويل أكبر من صفر"
+
+msgid "Purchase price cannot be negative"
+msgstr "لا يمكن أن يكون سعر الشراء سالبًا"
+
+msgid "Selling price cannot be negative"
+msgstr "لا يمكن أن يكون سعر البيع سالبًا"
+
+msgid "Item added successfully"
+msgstr "تمت إضافة العنصر بنجاح"
+
+msgid "Edit Item"
+msgstr "تعديل العنصر"
+
+msgid "Item updated successfully"
+msgstr "تم تحديث العنصر بنجاح"
+
+msgid "Deactivate Item"
+msgstr "تعطيل العنصر"
+
+msgid "Are you sure you want to deactivate this item?"
+msgstr "هل أنت متأكد أنك تريد تعطيل هذا العنصر؟"
+
+msgid "Item deactivated successfully"
+msgstr "تم تعطيل العنصر بنجاح"
+
+msgid "Items"
+msgstr "العناصر"
+
+msgid "Items List"
+msgstr "قائمة العناصر"
+
+msgid "View Stock Details"
+msgstr "عرض تفاصيل المخزون"
+
+msgid "Stock Details for {0}"
+msgstr "تفاصيل المخزون لـ {0}"
+
+msgid "Total Stock: {0} {1} ({2:.1f} {3})"
+msgstr "إجمالي المخزون: {0} {1} ({2:.1f} {3})"
+
+msgid "Main Unit: {0}, Sub Unit: {1}, Conversion: 1 {0} = {2} {1}"
+msgstr "الوحدة الرئيسية: {0}، الوحدة الفرعية: {1}، التحويل: 1 {0} = {2} {1}"
+
+msgid "Quantity ({0})"
+msgstr "الكمية ({0})"
+
+msgid "Last Updated"
+msgstr "آخر تحديث"
+
+msgid "Stock Management"
+msgstr "إدارة المخزون"
+
+msgid "Item Details"
+msgstr "تفاصيل العنصر"
+
+msgid "Warehouse:"
+msgstr "المستودع:"
+
+msgid "Stock Adjustment"
+msgstr "تعديل المخزون"
+
+msgid "Adjustment Type:"
+msgstr "نوع التعديل:"
+
+msgid "Add Stock"
+msgstr "إضافة مخزون"
+
+msgid "Remove Stock"
+msgstr "إزالة مخزون"
+
+msgid "Quantity:"
+msgstr "الكمية:"
+
+msgid "Apply Adjustment"
+msgstr "تطبيق التعديل"
+
+msgid "Quantity must be greater than zero"
+msgstr "يجب أن تكون الكمية أكبر من صفر"
+
+msgid "Stock updated successfully"
+msgstr "تم تحديث المخزون بنجاح"
+
+msgid "Stock Added"
+msgstr "تمت إضافة المخزون"
+
+msgid "{0} {1} added to {2}"
+msgstr "تمت إضافة {0} {1} إلى {2}"
+
+msgid "Stock Removed"
+msgstr "تمت إزالة المخزون"
+
+msgid "{0} {1} removed from {2}"
+msgstr "تمت إزالة {0} {1} من {2}"
+
+msgid "Insufficient stock"
+msgstr "المخزون غير كافٍ"
+
+msgid "Insufficient stock in source warehouse"
+msgstr "المخزون غير كافٍ في المستودع المصدر"
+
+msgid "Insufficient stock. Available: {0} {1}"
+msgstr "المخزون غير كافٍ. المتاح: {0} {1}"
+
+# Warehouse Management
+msgid "Warehouses Management"
+msgstr "إدارة المستودعات"
+
+msgid "Add New Warehouse"
+msgstr "إضافة مستودع جديد"
+
+msgid "Warehouse Name:"
+msgstr "اسم المستودع:"
+
+msgid "Warehouse Name"
+msgstr "اسم المستودع"
+
+msgid "Location:"
+msgstr "الموقع:"
+
+msgid "Location"
+msgstr "الموقع"
+
+msgid "Add Warehouse"
+msgstr "إضافة مستودع"
+
+msgid "Warehouse name is required"
+msgstr "اسم المستودع مطلوب"
+
+msgid "Warehouse added successfully"
+msgstr "تمت إضافة المستودع بنجاح"
+
+msgid "Edit Warehouse"
+msgstr "تعديل المستودع"
+
+msgid "Warehouse updated successfully"
+msgstr "تم تحديث المستودع بنجاح"
+
+msgid "Deactivate Warehouse"
+msgstr "تعطيل المستودع"
+
+msgid "Are you sure you want to deactivate this warehouse?"
+msgstr "هل أنت متأكد أنك تريد تعطيل هذا المستودع؟"
+
+msgid "Warehouse deactivated successfully"
+msgstr "تم تعطيل المستودع بنجاح"
+
+msgid "Warehouses"
+msgstr "المستودعات"
+
+msgid "Warehouses List"
+msgstr "قائمة المستودعات"
+
+msgid "View Inventory"
+msgstr "عرض المخزون"
+
+msgid "Item Count"
+msgstr "عدد العناصر"
+
+msgid "Inventory Value"
+msgstr "قيمة المخزون"
+
+msgid "Inventory for {0}"
+msgstr "المخزون لـ {0}"
+
+msgid "Inventory"
+msgstr "المخزون"
+
+msgid "Inventory Details"
+msgstr "تفاصيل المخزون"
+
+# Invoices
+msgid "Invoices Management"
+msgstr "إدارة الفواتير"
+
+msgid "New Purchase Invoice"
+msgstr "فاتورة شراء جديدة"
+
+msgid "New Sales Invoice"
+msgstr "فاتورة مبيعات جديدة"
+
+msgid "Invoice Settings"
+msgstr "إعدادات الفاتورة"
+
+msgid "Due Date:"
+msgstr "تاريخ الاستحقاق:"
+
+msgid "(Optional)"
+msgstr "(اختياري)"
+
+msgid "Additional Costs:"
+msgstr "تكاليف إضافية:"
+
+msgid "Tax:"
+msgstr "الضريبة:"
+
+msgid "Invoice Items"
+msgstr "عناصر الفاتورة"
+
+msgid "Item:"
+msgstr "العنصر:"
+
+msgid "Price per Unit:"
+msgstr "السعر لكل وحدة:"
+
+msgid "Use Purchase Price"
+msgstr "استخدام سعر الشراء"
+
+msgid "Use Selling Price"
+msgstr "استخدام سعر البيع"
+
+msgid "Create Purchase Invoice"
+msgstr "إنشاء فاتورة شراء"
+
+msgid "Create Sales Invoice"
+msgstr "إنشاء فاتورة مبيعات"
+
+msgid "Please add at least one item to the invoice"
+msgstr "يرجى إضافة عنصر واحد على الأقل إلى الفاتورة"
+
+msgid "Invalid invoice date format"
+msgstr "تنسيق تاريخ الفاتورة غير صالح"
+
+msgid "Invalid due date format"
+msgstr "تنسيق تاريخ الاستحقاق غير صالح"
+
+msgid "Purchase invoice created successfully"
+msgstr "تم إنشاء فاتورة الشراء بنجاح"
+
+msgid "Sales invoice created successfully"
+msgstr "تم إنشاء فاتورة المبيعات بنجاح"
+
+msgid "Supplier"
+msgstr "المورد"
+
+msgid "Customer"
+msgstr "العميل"
+
+msgid "Supplier & Customer"
+msgstr "مورد وعميل"
+
+msgid "Invoice Details - {0}"
+msgstr "تفاصيل الفاتورة - {0}"
+
+msgid "Purchase Invoice"
+msgstr "فاتورة شراء"
+
+msgid "Sales Invoice"
+msgstr "فاتورة مبيعات"
+
+msgid "Pending"
+msgstr "قيد الانتظار"
+
+msgid "Partially Paid"
+msgstr "مدفوع جزئيًا"
+
+msgid "Paid"
+msgstr "مدفوع"
+
+msgid "Cancelled"
+msgstr "ملغي"
+
+msgid "Items"
+msgstr "العناصر"
+
+msgid "Payments"
+msgstr "المدفوعات"
+
+msgid "Invoice:"
+msgstr "الفاتورة:"
+
+msgid "Total:"
+msgstr "الإجمالي:"
+
+msgid "Subtotal:"
+msgstr "المجموع الفرعي:"
+
+msgid "Total Amount:"
+msgstr "المبلغ الإجمالي:"
+
+msgid "Paid:"
+msgstr "المدفوع:"
+
+msgid "Remaining:"
+msgstr "المتبقي:"
+
+msgid "Record Payment"
+msgstr "تسجيل دفع"
+
+msgid "Cancel Invoice"
+msgstr "إلغاء الفاتورة"
+
+msgid "Invoice Number"
+msgstr "رقم الفاتورة"
+
+msgid "Entity"
+msgstr "الكيان"
+
+msgid "Payment Method:"
+msgstr "طريقة الدفع:"
+
+msgid "Fund:"
+msgstr "الصندوق:"
+
+msgid "Amount must be greater than zero"
+msgstr "يجب أن يكون المبلغ أكبر من صفر"
+
+msgid "Invalid date format"
+msgstr "تنسيق التاريخ غير صالح"
+
+msgid "Payment recorded successfully"
+msgstr "تم تسجيل الدفع بنجاح"
+
+msgid "Make Payment"
+msgstr "إجراء الدفع"
+
+msgid "Receive Payment"
+msgstr "استلام الدفع"
+
+msgid "Are you sure you want to cancel this invoice? This will reverse all stock changes."
+msgstr "هل أنت متأكد أنك تريد إلغاء هذه الفاتورة؟ سيؤدي هذا إلى عكس جميع تغييرات المخزون."
+
+msgid "Invoice cancelled successfully"
+msgstr "تم إلغاء الفاتورة بنجاح"
+
+msgid "This invoice cannot receive payments"
+msgstr "لا يمكن لهذه الفاتورة استلام مدفوعات"
+
+# Expenses
+msgid "Expense Management"
+msgstr "إدارة المصروفات"
+
+msgid "Add New Expense"
+msgstr "إضافة مصروف جديد"
+
+msgid "Category:"
+msgstr "الفئة:"
+
+msgid "Add Expense"
+msgstr "إضافة مصروف"
+
+msgid "Expense added successfully"
+msgstr "تمت إضافة المصروف بنجاح"
+
+msgid "Add New Category"
+msgstr "إضافة فئة جديدة"
+
+msgid "Category Name:"
+msgstr "اسم الفئة:"
+
+msgid "Category name is required"
+msgstr "اسم الفئة مطلوب"
+
+msgid "Add Category"
+msgstr "إضافة فئة"
+
+msgid "Category added successfully"
+msgstr "تمت إضافة الفئة بنجاح"
+
+msgid "Edit Category"
+msgstr "تعديل الفئة"
+
+msgid "Category updated successfully"
+msgstr "تم تحديث الفئة بنجاح"
+
+msgid "Expenses"
+msgstr "المصروفات"
+
+msgid "Expenses List"
+msgstr "قائمة المصروفات"
+
+msgid "Categories"
+msgstr "الفئات"
+
+msgid "Category Name"
+msgstr "اسم الفئة"
+
+msgid "Total Expenses: {0:.2f} USD"
+msgstr "إجمالي المصروفات: {0:.2f} دولار"
+
+# Suppliers & Customers
+msgid "Suppliers & Customers"
+msgstr "الموردون والعملاء"
+
+msgid "Add New Supplier or Customer"
+msgstr "إضافة مورد أو عميل جديد"
+
+msgid "Phone:"
+msgstr "الهاتف:"
+
+msgid "Phone"
+msgstr "الهاتف"
+
+msgid "Email:"
+msgstr "البريد الإلكتروني:"
+
+msgid "Email"
+msgstr "البريد الإلكتروني"
+
+msgid "Address:"
+msgstr "العنوان:"
+
+msgid "Address"
+msgstr "العنوان"
+
+msgid "Add Entity"
+msgstr "إضافة كيان"
+
+msgid "Entity added successfully"
+msgstr "تمت إضافة الكيان بنجاح"
+
+msgid "Edit {0}"
+msgstr "تعديل {0}"
+
+msgid "Entity updated successfully"
+msgstr "تم تحديث الكيان بنجاح"
+
+msgid "Supplier"
+msgstr "المورد"
+
+msgid "Customer"
+msgstr "العميل"
+
+msgid "Both"
+msgstr "كلاهما"
+
+msgid "Suppliers"
+msgstr "الموردون"
+
+msgid "Customers"
+msgstr "العملاء"
+
+msgid "Entity Information"
+msgstr "معلومات الكيان"
+
+msgid "Payment History - {0}"
+msgstr "سجل المدفوعات - {0}"
+
+msgid "Type: {0} | Balance: {1} {2}"
+msgstr "النوع: {0} | الرصيد: {1} {2}"
+
+msgid "Invoice"
+msgstr "الفاتورة"
+
+msgid "Payment Details"
+msgstr "تفاصيل الدفع"
+
+msgid "Payment Date:"
+msgstr "تاريخ الدفع:"
+
+msgid "{0} Payment"
+msgstr "دفع {0}"
+
+msgid "{0} Payment - {1}"
+msgstr "دفع {0} - {1}"
+
+msgid "Make"
+msgstr "إجراء"
+
+msgid "Receive"
+msgstr "استلام"
+
+msgid "Direct Payment"
+msgstr "دفع مباشر"
+
+# Reports
+msgid "Reports"
+msgstr "التقارير"
+
+msgid "Reports Dashboard"
+msgstr "لوحة التقارير"
+
+msgid "Quick Access"
+msgstr "الوصول السريع"
+
+msgid "Key Metrics"
+msgstr "المقاييس الرئيسية"
+
+msgid "Monthly Sales"
+msgstr "المبيعات الشهرية"
+
+msgid "Receivables"
+msgstr "المستحقات"
+
+msgid "Monthly Expenses"
+msgstr "المصروفات الشهرية"
+
+msgid "Payables"
+msgstr "المدفوعات المستحقة"
+
+msgid "Monthly Profit"
+msgstr "الربح الشهري"
+
+msgid "Total: {0:.2f}"
+msgstr "الإجمالي: {0:.2f}"
+
+msgid "Items: {0}"
+msgstr "العناصر: {0}"
+
+msgid "Sales Trend (Last 30 Days)"
+msgstr "اتجاه المبيعات (آخر 30 يومًا)"
+
+msgid "No Sales Data Available"
+msgstr "لا تتوفر بيانات مبيعات"
+
+msgid "Dashboard"
+msgstr "لوحة المعلومات"
+
+msgid "Report Filters"
+msgstr "مرشحات التقرير"
+
+msgid "Date Range:"
+msgstr "النطاق الزمني:"
+
+msgid "Last 30 Days"
+msgstr "آخر 30 يومًا"
+
+msgid "This Month"
+msgstr "هذا الشهر"
+
+msgid "Last Month"
+msgstr "الشهر الماضي"
+
+msgid "This Quarter"
+msgstr "هذا الربع"
+
+msgid "This Year"
+msgstr "هذا العام"
+
+msgid "Custom"
+msgstr "مخصص"
+
+msgid "From:"
+msgstr "من:"
+
+msgid "To:"
+msgstr "إلى:"
+
+msgid "All Customers"
+msgstr "جميع العملاء"
+
+msgid "Generate Report"
+msgstr "إنشاء التقرير"
+
+msgid "Please enter valid dates"
+msgstr "يرجى إدخال تواريخ صالحة"
+
+msgid "Report Generated"
+msgstr "تم إنشاء التقرير"
+
+msgid "Sales report generated successfully"
+msgstr "تم إنشاء تقرير المبيعات بنجاح"
+
+msgid "Error generating report: {0}"
+msgstr "خطأ في إنشاء التقرير: {0}"
+
+msgid "No chart data available"
+msgstr "لا تتوفر بيانات الرسم البياني"
+
+msgid "Error displaying chart: {0}"
+msgstr "خطأ في عرض الرسم البياني: {0}"
+
+msgid "Summary"
+msgstr "الملخص"
+
+msgid "Sales Chart"
+msgstr "رسم بياني للمبيعات"
+
+msgid "Details"
+msgstr "التفاصيل"
+
+msgid "All Warehouses"
+msgstr "جميع المستودعات"
+
+msgid "Inventory report generated successfully"
+msgstr "تم إنشاء تقرير المخزون بنجاح"
+
+msgid "No fund data available"
+msgstr "لا تتوفر بيانات الصندوق"
+
+msgid "No expense data available"
+msgstr "لا تتوفر بيانات المصروفات"
+
+msgid "Financial report generated successfully"
+msgstr "تم إنشاء التقرير المالي بنجاح"
+
+msgid "Financial Analysis"
+msgstr "التحليل المالي"
+
+msgid "Total Sales:"
+msgstr "إجمالي المبيعات:"
+
+msgid "Total Expenses:"
+msgstr "إجمالي المصروفات:"
+
+msgid "Total Purchases:"
+msgstr "إجمالي المشتريات:"
+
+msgid "Profit:"
+msgstr "الربح:"
+
+msgid "Report Date:"
+msgstr "تاريخ التقرير:"
+
+msgid "Minimum Balance:"
+msgstr "الحد الأدنى للرصيد:"
+
+msgid "Total Receivables:"
+msgstr "إجمالي المستحقات:"
+
+msgid "Total Payables:"
+msgstr "إجمالي المدفوعات المستحقة:"
+
+msgid "Net Position:"
+msgstr "الموقف الصافي:"
+
+msgid "Customers with Debt:"
+msgstr "العملاء المدينون:"
+
+msgid "Suppliers to Pay:"
+msgstr "الموردون المستحقون للدفع:"
+
+msgid "Receivables & Payables report generated successfully"
+msgstr "تم إنشاء تقرير المستحقات والمدفوعات المستحقة بنجاح"
+
+msgid "No receivables data available"
+msgstr "لا تتوفر بيانات المستحقات"
+
+msgid "No payables data available"
+msgstr "لا تتوفر بيانات المدفوعات المستحقة"
+
+msgid "No report data available to export"
+msgstr "لا تتوفر بيانات تقرير للتصدير"
+
+msgid "Receivables & Payables"
+msgstr "المستحقات والمدفوعات المستحقة"
+
+msgid "Receivables (Customers)"
+msgstr "المستحقات (العملاء)"
+
+msgid "Payables (Suppliers)"
+msgstr "المدفوعات المستحقة (الموردون)"
+
+msgid "Sales Report"
+msgstr "تقرير المبيعات"
+
+msgid "Inventory Report"
+msgstr "تقرير المخزون"
+
+msgid "Financial Report"
+msgstr "التقرير المالي"
+
+msgid "USD Equivalent"
+msgstr "المعادل بالدولار الأمريكي"
