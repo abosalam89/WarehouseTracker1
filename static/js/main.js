@@ -5,6 +5,34 @@
 
 // Wait for document to be ready
 document.addEventListener('DOMContentLoaded', function() {
+    // Language switcher
+    document.querySelectorAll('.language-switcher').forEach(function(langBtn) {
+        langBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            
+            // Get language code from data attribute
+            var langCode = langBtn.getAttribute('data-lang');
+            
+            // Send AJAX request to switch language
+            fetch('/set_language/' + langCode, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Reload the page to reflect language change
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error switching language:', error);
+            });
+        });
+    });
+    
     // Initialize tooltips
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     tooltipTriggerList.map(function(tooltipTriggerEl) {
