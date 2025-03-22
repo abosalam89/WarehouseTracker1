@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Login - ASSI Warehouse Management System{% endblock %}
+{% block title %}{{ _('Login') }} - {{ _('ASSI Warehouse Management System') }}{% endblock %}
 
 {% block navbar %}{% endblock %}
 
@@ -11,13 +11,13 @@
             <div class="card-header bg-primary text-white text-center py-3">
                 <h4 class="mb-0">
                     <i class="fas fa-warehouse me-2"></i>
-                    ASSI WMS
+                    {{ _('ASSI WMS') }}
                 </h4>
             </div>
             <div class="card-body p-4">
                 <h5 class="card-title text-center mb-4">
                     <i class="fas fa-sign-in-alt me-2"></i>
-                    Login
+                    {{ _('Login') }}
                 </h5>
                 
                 {% if error %}
@@ -31,21 +31,21 @@
                     <div class="mb-3">
                         <label for="username" class="form-label">
                             <i class="fas fa-user me-2"></i>
-                            Username
+                            {{ _('Username') }}
                         </label>
                         <input type="text" class="form-control" id="username" name="username" required autofocus>
                     </div>
                     <div class="mb-4">
                         <label for="password" class="form-label">
                             <i class="fas fa-lock me-2"></i>
-                            Password
+                            {{ _('Password') }}
                         </label>
                         <input type="password" class="form-control" id="password" name="password" required>
                     </div>
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary btn-lg">
                             <i class="fas fa-sign-in-alt me-2"></i>
-                            Login
+                            {{ _('Sign in') }}
                         </button>
                     </div>
                 </form>
@@ -55,18 +55,18 @@
                         <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
                                 id="languageMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-language me-1"></i>
-                            Language
+                            {{ _('Language') }}
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageMenuButton">
                             <li>
-                                <a class="dropdown-item language-option" href="#" data-lang="en_US">
+                                <a class="dropdown-item language-switcher" href="#" data-lang="en_US">
                                     <img src="{{ url_for('static', filename='img/flags/us.svg') }}" 
                                          alt="English" class="flag-icon me-2" width="20">
                                     English
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item language-option" href="#" data-lang="ar_SA">
+                                <a class="dropdown-item language-switcher" href="#" data-lang="ar_SA">
                                     <img src="{{ url_for('static', filename='img/flags/sa.svg') }}" 
                                          alt="Arabic" class="flag-icon me-2" width="20">
                                     العربية
@@ -77,7 +77,7 @@
                 </div>
             </div>
             <div class="card-footer text-center text-muted py-3">
-                Default login: admin / admin
+                {{ _('Default login') }}: admin / admin
             </div>
         </div>
     </div>

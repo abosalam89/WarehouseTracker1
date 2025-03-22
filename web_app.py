@@ -895,7 +895,7 @@ def server_error(e):
     return render_template('errors/500.html'), 500
 
 # Import language functions at the top level
-from utils.language import switch_language, get_current_language
+from utils.language import switch_language, get_current_language, _
 
 # Language switching route
 @app.route('/set_language/<lang_code>', methods=['POST'])
@@ -904,8 +904,9 @@ def set_language(lang_code):
     switch_language(lang_code)
     return jsonify({'success': True})
 
-# Add get_current_language to Jinja environment
+# Add language functions to Jinja environment
 app.jinja_env.globals.update(get_current_language=get_current_language)
+app.jinja_env.globals.update(_=_)
 
 # Create static folders for uploads and exports
 # Create necessary folders
