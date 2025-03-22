@@ -1,0 +1,125 @@
+/**
+ * RTL styles for ASSI Warehouse Management System
+ * These styles are applied when the language is set to Arabic
+ */
+
+/* Basic direction settings */
+body {
+    direction: rtl;
+    text-align: right;
+}
+
+/* Adjust bootstrap components */
+.me-1, .me-2, .me-3, .me-4, .me-5 {
+    margin-right: 0 !important;
+}
+
+.me-1 {
+    margin-left: 0.25rem !important;
+}
+
+.me-2 {
+    margin-left: 0.5rem !important;
+}
+
+.me-3 {
+    margin-left: 1rem !important;
+}
+
+.me-4 {
+    margin-left: 1.5rem !important;
+}
+
+.me-5 {
+    margin-left: 3rem !important;
+}
+
+/* Navbar adjustments */
+.dropdown-menu-end {
+    right: auto !important;
+    left: 0 !important;
+}
+
+/* Card and form adjustments */
+.card-header, .card-body, .card-footer {
+    text-align: right;
+}
+
+.form-label {
+    text-align: right;
+}
+
+/* Table adjustments */
+th, td {
+    text-align: right;
+}
+
+/* List group adjustments */
+.list-group-item {
+    text-align: right;
+}
+
+/* Icon positioning */
+.fas, .far, .fab {
+    margin-right: 0;
+    margin-left: 0.5rem;
+}
+
+/* Adjust input groups */
+.input-group > .form-control:not(:last-child),
+.input-group > .custom-select:not(:last-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+}
+
+.input-group > .form-control:not(:first-child),
+.input-group > .custom-select:not(:first-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
+}
+
+/* Modal adjustments */
+.modal-header .close {
+    margin: -1rem auto -1rem -1rem;
+}
+
+/* Alert adjustments */
+.alert-dismissible .close {
+    right: auto;
+    left: 0;
+}
+
+/* Offcanvas adjustments */
+.offcanvas-start {
+    right: 0;
+    left: auto;
+    transform: translateX(100%);
+}
+
+.offcanvas-end {
+    left: 0;
+    right: auto;
+    transform: translateX(-100%);
+}
+
+/* Float adjustments */
+.float-start {
+    float: right !important;
+}
+
+.float-end {
+    float: left !important;
+}
+
+/* Text alignment adjustments */
+.text-start {
+    text-align: right !important;
+}
+
+.text-end {
+    text-align: left !important;
+}
