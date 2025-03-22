@@ -129,30 +129,23 @@
     <!-- Custom JS -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script>
-        // Language switcher
-        $('.language-option').on('click', function(e) {
-            e.preventDefault();
-            var lang = $(this).data('lang');
-            
-            // Set RTL for Arabic
-            if (lang === 'ar_SA') {
-                $('html').attr('dir', 'rtl');
-                $('#rtl-stylesheet').removeAttr('disabled');
+        // RTL support functions
+        function setRTL(isRTL) {
+            if (isRTL) {
+                document.querySelector('html').setAttribute('dir', 'rtl');
+                document.getElementById('rtl-stylesheet').removeAttribute('disabled');
             } else {
-                $('html').attr('dir', 'ltr');
-                $('#rtl-stylesheet').attr('disabled', 'disabled');
+                document.querySelector('html').setAttribute('dir', 'ltr');
+                document.getElementById('rtl-stylesheet').setAttribute('disabled', 'disabled');
             }
-            
-            // Send AJAX request to change language
-            $.ajax({
-                url: "/set_language/" + lang,
-                type: "POST",
-                success: function() {
-                    // Reload page
-                    location.reload();
-                }
-            });
-        });
+        }
+        
+        // Initialize RTL based on current language
+        {% if get_current_language() == 'ar_SA' %}
+        setRTL(true);
+        {% else %}
+        setRTL(false);
+        {% endif %}
     </script>
     {% block scripts %}{% endblock %}
 </body>

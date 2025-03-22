@@ -7,8 +7,11 @@ Flask-based web interface for the Warehouse Management System
 """
 
 import os
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 import sys
+import json
+import datetime
+from datetime import timedelta
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, send_file, abort
 
 # Setup path for imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -891,13 +894,18 @@ def page_not_found(e):
 def server_error(e):
     return render_template('errors/500.html'), 500
 
+# Import language functions at the top level
+from utils.language import switch_language, get_current_language
+
 # Language switching route
 @app.route('/set_language/<lang_code>', methods=['POST'])
 def set_language(lang_code):
     """Set the application language"""
-    from utils.language import switch_language
     switch_language(lang_code)
     return jsonify({'success': True})
+
+# Add get_current_language to Jinja environment
+app.jinja_env.globals.update(get_current_language=get_current_language)
 
 # Create static folders for uploads and exports
 # Create necessary folders

@@ -13,6 +13,13 @@ document.addEventListener('DOMContentLoaded', function() {
             // Get language code from data attribute
             var langCode = langBtn.getAttribute('data-lang');
             
+            // Set RTL for Arabic
+            if (langCode === 'ar_SA') {
+                setRTL(true);
+            } else {
+                setRTL(false);
+            }
+            
             // Send AJAX request to switch language
             fetch('/set_language/' + langCode, {
                 method: 'POST',
